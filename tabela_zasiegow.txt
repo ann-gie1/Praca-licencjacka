@@ -1,0 +1,107 @@
+Izotop  E_mean [MeV]  R_10%  R_50%  R_90%  R_mean (Wzór 4 mgr. Mryka)  R_max (Wzór 5 mgr. Mryka)
+   18F         0.289   0.19   0.73   1.45             0.26              2.27
+  44Sc         0.683   0.75   2.48   4.53             0.70              6.63
+  68Ga         0.884   1.11   3.49   6.21             0.94              8.92
+
+Z R_max znalitycznym:
+
+===============================================================================================
+IZOTOP   | E_max  | E_mean || R_mean(Wz4) |R_50% || R_max(Wz5)   || R_analyt(Emax)  | Delta(%)
+-----------------------------------------------------------------------------------------------
+18F      | 0.634  | 0.289  || 0.26        | 0.73 || 2.27         || 2.26            | +0.2%
+44Sc     | 1.474  | 0.683  || 0.70        | 2.48 || 6.63         || 6.65            | -0.2%
+68Ga     | 1.899  | 0.884  || 0.94        | 3.49 || 8.92         || 8.95            | -0.3%
+===============================================================================================
+* R_analyt(Emax) to zasięg obliczony ze wzoru ciągłego (tło wykresu) dla energii maksymalnej.
+* Delta(%) pokazuje różnicę wzoru ze zdjęcia (Wz5) względem analitycznego.
+
+##Nowe zasięgi
+--- WYNIKI ZASIĘGÓW (Tabela referencyjna) ---
+Isotope  R(E_max) [mm]  R(<E>) [mm]  <R> (Mean R) [mm]  R(median) [mm]
+    18F          2.270        0.742              0.783           0.730
+   44Sc          6.635        2.509              2.577           2.485
+   68Ga          8.916        3.521              3.591           3.494
+-----------------------
+
+--- TABELA ZASIĘGÓW (Modele analityczne: Cal-Gonzalez / Katz-Penfold) ---
+Isotope  R_max(E_max) [Eq3]  R_mean(<E>) [Eq2]  <R_mean> (True Mean) [Eq2]  R_mean(E_median) [Eq2]
+    18F               2.270              0.263                       0.267                   0.260
+   44Sc               6.635              0.699                       0.710                   0.694
+   68Ga               8.916              0.939                       0.953                   0.932
+
+
+
+-----SYMULACJE PROMIENI SFER VS SFERY Z NEMA IQ FANTOM SYMULACJA (Katz-Penfold)-----
+=== WYNIKI DLA FLUORU (18F) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               6.564                  3.813                     3.968               10.5
+                  13               8.281                  4.947                     5.181                9.3
+                  17               9.964                  6.424                     6.741                7.3
+                  22              12.768                  8.244                     8.693                5.3
+                  28              15.367                 10.431                    11.004                3.7
+                  37              19.631                 13.871                    14.644                3.2
+
+=== WYNIKI DLA SKANDU (44Sc) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10              10.293                  4.563                     4.495               36.7
+                  13              12.063                  5.511                     5.538               29.0
+                  17              14.142                  6.894                     6.974               22.6
+                  22              16.119                  8.684                     8.865               17.6
+                  28              19.448                 10.799                    11.088               14.4
+                  37              23.176                 14.160                    14.770               10.8
+-----SYMULACJE PROMIENI SFER VS SFERY Z NEMA IQ FANTOM SYMULACJA (Cal-Gonzales)-----
+=== WYNIKI DLA FLUORU (18F) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               5.387                  3.745                     3.964                3.9
+                  13               6.994                  4.888                     5.167                3.3
+                  17               8.923                  6.383                     6.739                2.3
+                  22              11.472                  8.214                     8.703                1.8
+                  28              14.380                 10.404                    11.002                1.2
+                  37              18.823                 13.855                    14.639                1.0
+
+=== WYNIKI DLA SKANDU (44Sc) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               6.153                  3.827                     3.977               10.3
+                  13               7.816                  4.924                     5.152                8.6
+                  17               9.893                  6.417                     6.749                6.4
+                  22              12.292                  8.332                     8.779                4.8
+                  28              15.344                 10.492                    11.016                3.9
+                  37              19.557                 13.925                    14.687                3.2
+
+
+-----SYMULACJE PROMIENI SFER VS SFERY Z NEMA IQ FANTOM SYMULACJA (Katz-Penfold z grubością i materiałem sfer)-----
+=== WYNIKI DLA FLUORU (18F) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               6.375                  3.807                     3.968               10.5
+                  13               8.096                  4.941                     5.181                9.3
+                  17               9.780                  6.420                     6.741                7.3
+                  22              12.581                  8.241                     8.693                5.3
+                  28              15.186                 10.429                    11.004                3.7
+                  37              19.454                 13.870                    14.644                3.2
+
+=== WYNIKI DLA SKANDU (44Sc) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10              10.097                  4.511                     4.495               36.7
+                  13              11.882                  5.471                     5.538               29.0
+                  17              13.961                  6.863                     6.974               22.6
+                  22              15.935                  8.661                     8.865               17.6
+                  28              19.259                 10.781                    11.088               14.4
+                  37              22.988                 14.146                    14.770               10.8
+-----SYMULACJE PROMIENI SFER VS SFERY Z NEMA IQ FANTOM SYMULACJA (Cal-Gonzalesz grubością i materiałem sfer)-----
+=== WYNIKI DLA FLUORU (18F) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               5.328                  3.744                     3.964                3.9
+                  13               6.918                  4.887                     5.167                3.3
+                  17               8.858                  6.383                     6.739                2.3
+                  22              11.400                  8.214                     8.703                1.8
+                  28              14.322                 10.404                    11.002                1.2
+                  37              18.774                 13.855                    14.639                1.0
+
+=== WYNIKI DLA SKANDU (44Sc) ===
+ Średnica sfery [mm]  Max R końcowy [mm]  Średni R końcowy [mm]  Mediana R końcowego [mm]  Spill-out PVE [%]
+                  10               5.973                  3.823                     3.977               10.3
+                  13               7.636                  4.920                     5.152                8.6
+                  17               9.712                  6.414                     6.749                6.4
+                  22              12.111                  8.330                     8.779                4.8
+                  28              15.162                 10.490                    11.016                3.9
+                  37              19.395                 13.923                    14.687                3.2
