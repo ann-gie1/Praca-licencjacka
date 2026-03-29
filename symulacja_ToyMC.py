@@ -18,6 +18,7 @@ diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
 # -------------------------------------------------------
 results_18F = []
 results_44Sc = []
+list_of_df =[]
 
 df = pd.read_csv("./wygenerowane_dane/Generacja_danych.csv")
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
@@ -30,6 +31,7 @@ for (iso, d), group in grouped_df:
     R_in = d / 2.0
     R_out = R_in + wall_thickness_mm
     
+    n = group['Index']
     # Extract data directly from the subset (O(1) operation)
     x0 = group['x']
     y0 = group['y']
@@ -74,6 +76,10 @@ for (iso, d), group in grouped_df:
     Rf = np.sqrt(xf**2 + yf**2 + zf**2)
     
     # TUTAJ ZROBIC DUMP DO PLIKU. FORMAT DO USTALENIA
+    data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'xf': xf, 'yf': yf, 'zf': zf}
+    df_MC = pd.DataFrame(data)
+
+    list_of_df.append(df_MC)
 
     # 7. Metryki
     # Spill-out dotyczy opuszczenia aktywnej objętości wewnętrznej (R_in)
@@ -91,6 +97,10 @@ for (iso, d), group in grouped_df:
         results_18F.append(row)
     else:
         results_44Sc.append(row)
+
+final_df = pd.concat(list_of_df)
+final_df.to_csv("./wygenerowane_dane/wyniki_symulacji.csv", index=False)
+
 print("\n=== WYNIKI DLA FLUORU (18F) ===")
 print(pd.DataFrame(results_18F).to_string(index=False))
 print("\n=== WYNIKI DLA SKANDU (44Sc) ===")

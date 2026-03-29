@@ -12,7 +12,7 @@ wall_thickness_mm = 1.0   # Grubość ścianki w [mm] (zmień na 10.0 jeśli ser
 
 isotopes = {"18F": (0.634, 8), "44Sc": (1.474, 20)} # max energia emisji, liczba atomowa isotopu <<< DO SPRAWDZENIA :)
 diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
-N_sim = 5
+N_sim = 100
 
 def momentum(E): # założenie: liczymy tylko dla elektronu
     return np.sqrt(E**2 + 2 * m_e * E) # liczenie pędu
@@ -54,7 +54,7 @@ def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sa
 # Symulacja Monte Carlo z geometrią sfery (woda -> plastik -> woda)
 # -------------------------------------------------------
 list_of_df = []
-
+n = np.array([i for i in range(100)])
 for iso, (E0, Z) in isotopes.items():
     for d in diameters_mm:
         # DODAĆ SYMULACJĘ EVENT BY EVENT < - niski priorytet
@@ -88,14 +88,17 @@ for iso, (E0, Z) in isotopes.items():
 
         # --- Koniec generacji
 
-        data = {'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
+        data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
         df = pd.DataFrame(data)
 
         list_of_df.append(df)
+
+        n = n+100
+
 
 final_df = pd.concat(list_of_df)
 final_df.to_csv("./wygenerowane_dane/Generacja_danych.csv", index=False)
 
 # TODO: Inny plik
 #TO DO WYRYSOWAĆ X0, Y0, Z0, r_pos, theta_pos, cos_phi_pos, sin_phi_pos
- #Jak w :194 zrobić rysunki kontrolne - wektorki kierunku
+# #Jak w :194 zrobić rysunki kontrolne - wektorki kierunku
