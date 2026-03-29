@@ -88,7 +88,7 @@ for iso, (E0, Z) in isotopes.items():
 
         # --- Koniec generacji
 
-        data = {'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Zasięg': X_range}
+        data = {'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
         df = pd.DataFrame(data)
 
         list_of_df.append(df)
