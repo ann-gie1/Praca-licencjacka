@@ -3,7 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 # 1. Wczytanie danych
-df = pd.read_csv("./wygenerowane_dane/Generacja_danych.csv", sep=";")
+df = pd.read_csv("./wygenerowane_dane/Generacja_danych.csv")
 
 # 2. Interaktywny wybór w konsoli
 print(f"Dostępne izotopy: {df['Izotop'].unique()}")
