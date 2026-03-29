@@ -158,6 +158,7 @@ def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sa
     startOfRange = 0.01
     endOfRange = 5000
     # TO DO, dodać liczenie maksymalnej energii emisji
+    # max()
     E_grid = np.linspace(startOfRange, E0, endOfRange)
     print( E_grid )
     spectrum = beta_plus_spectrum(E_grid, E0, Z)
@@ -207,6 +208,7 @@ for iso, (E0, Z) in isotopes.items():
 
         # 3. Zasięg bazowy (wodny)
         E_sampled = sample_energies(E0, Z, N_sim)
+        # Jezeli chcesz dodac max to uzyj max(E_sampled)
         X_range = compute_X(E_sampled)
         
         # 4. Ray-tracing: Przecięcie promienia ze sferą wewnętrzną i zewnętrzną
