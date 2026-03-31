@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 # -------------------------------------------------------
 # Zmienne i funkcje fizyczne
 # -------------------------------------------------------
@@ -16,8 +16,8 @@ diameters_mm = [10, 13, 17, 22, 28, 37]
 # -------------------------------------------------------
 # Przetwarzanie danych
 # -------------------------------------------------------
-df = pd.read_csv("./wygenerowane_dane/Generacja_danych.csv")
-df1 = pd.read_csv("./wygenerowane_dane/wyniki_symulacji.csv")
+df = pd.read_csv("./dane_symulacja_CSDA/Generacja_danych.csv")
+df1 = pd.read_csv("./dane_symulacja_CSDA/wyniki_symulacji.csv")
 
 # Łączenie plików ZA ZANIM zaczniemy liczyć i grupować
 df_merged = pd.merge(df, df1, on=['Index', 'Izotop', 'Srednica_mm'])
@@ -105,7 +105,7 @@ add_labels(bars2)
 
 plt.tight_layout()
 # Zapis wykresu do pliku PNG (dodano dpi=300 dla wysokiej jakości)
-plt.savefig("./wygenerowane_dane/Histogram spill-out.png", format='png', dpi=300)
+plt.savefig("./dane_symulacja_CSDA/Histogram spill-out.png", format='png', dpi=300)
 
 # Zamknięcie figury (brak wyświetlania w oknie)
 plt.close()
@@ -159,10 +159,83 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.xlim(0, max_rf)
 
 plt.tight_layout()
-nazwa_pliku = f"./wygenerowane_dane/histogram_{wybrany_izotop}_{wybrana_srednica}mm.png"
+nazwa_pliku = f"./dane_symulacja_CSDA/histogram_{wybrany_izotop}_{wybrana_srednica}mm.png"
 
 # Zapis wykresu do pliku PNG (dodano dpi=300 dla wysokiej jakości)
 plt.savefig(nazwa_pliku, format='png', dpi=300)
 
 # Zamknięcie figury (brak wyświetlania w oknie)
+plt.close()
+
+# 1. Zbieranie danych do wspólnej tabeli
+dane_wykres = []
+
+for d in diameters_mm:
+    df_d = df_merged[df_merged['Srednica_mm'] == d]
+    r_in = d / 2.0
+    r_out = r_in + wall_thickness_mm
+    
+    for izotop in ['18F', '44Sc']:
+        rf = df_d[df_d['Izotop'] == izotop]['R_f']
+        if len(rf) > 0:
+            dane_wykres.append({
+                'Średnica': f'{d} mm',
+                'Izotop': izotop,
+                'Miejsce': 'Wewnątrz sfery\n(woda)',
+                'Udział [%]': (np.sum(rf < r_in) / len(rf)) * 100
+            })
+            dane_wykres.append({
+                'Średnica': f'{d} mm',
+                'Izotop': izotop,
+                'Miejsce': 'Ściana sfery\n(PMMA)',
+                'Udział [%]': (np.sum((rf >= r_in) & (rf <= r_out)) / len(rf)) * 100
+            })
+            dane_wykres.append({
+                'Średnica': f'{d} mm',
+                'Izotop': izotop,
+                'Miejsce': 'Poza sferą\n(woda)',
+                'Udział [%]': (np.sum(rf > r_out) / len(rf)) * 100
+            })
+
+df_plot = pd.DataFrame(dane_wykres)
+# Tworzenie połączonej etykiety do legendy
+df_plot['Grupa'] = df_plot['Średnica'] + ' - ' + df_plot['Izotop']
+
+# 2. Rysowanie wspólnego wykresu
+plt.figure(figsize=(14, 7))
+
+# Używamy seaborn do automatycznego pogrupowania słupków obok siebie
+ax = sns.barplot(
+    data=df_plot, 
+    x='Miejsce', 
+    y='Udział [%]', 
+    hue='Grupa', 
+    edgecolor='black'
+)
+
+# Funkcja do dodawania etykiet na słupkach
+for p in ax.patches:
+    height = p.get_height()
+    # seaborn tworzy puste słupki (nan) tam, gdzie nie ma danych, więc trzeba to obsłużyć
+    if not np.isnan(height) and height > 0:
+        ax.annotate(f'{height:.1f}%', 
+                    (p.get_x() + p.get_width() / 2., height),
+                    ha='center', va='bottom', fontsize=8, fontweight='bold', 
+                    xytext=(0, 3), textcoords='offset points', rotation=90)
+
+# Formatowanie
+plt.title('Miejsce anihilacji pozytonów - Wszystkie średnice (18F vs 44Sc)', fontsize=14, fontweight='bold')
+plt.ylabel('Udział [%]', fontsize=12)
+plt.xlabel('')
+plt.legend(title='Średnica - Izotop', bbox_to_anchor=(1.01, 1), loc='upper left', fontsize=10)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+# Dynamiczne skalowanie osi Y
+max_y = df_plot['Udział [%]'].max() if not df_plot.empty else 100
+plt.ylim(0, max_y + 15)
+
+plt.tight_layout()
+
+# Zapis zbiorczego wykresu
+plt.savefig('./dane_symulacja_CSDA/porownanie_anihilacji_wszystkie.png', format='png', dpi=300)
 plt.close()
