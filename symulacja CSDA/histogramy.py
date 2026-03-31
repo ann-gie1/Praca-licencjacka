@@ -22,7 +22,6 @@ df1 = pd.read_csv("./wygenerowane_dane/wyniki_symulacji.csv")
 # Łączenie plików ZA ZANIM zaczniemy liczyć i grupować
 df_merged = pd.merge(df, df1, on=['Index', 'Izotop', 'Srednica_mm'])
 
-print("Dostępne kolumny:", df_merged.columns.tolist())
 # Obliczamy promień finalny
 df_merged['R_f'] = np.sqrt(df_merged['xf']**2 + df_merged['yf']**2 + df_merged['zf']**2)
 
@@ -105,4 +104,65 @@ add_labels(bars1)
 add_labels(bars2)
 
 plt.tight_layout()
-plt.savefig("./wygenerowane_dane/Histogram spill-out.png")
+# Zapis wykresu do pliku PNG (dodano dpi=300 dla wysokiej jakości)
+plt.savefig("./wygenerowane_dane/Histogram spill-out.png", format='png', dpi=300)
+
+# Zamknięcie figury (brak wyświetlania w oknie)
+plt.close()
+
+# -------------------------------------------------------
+# Rysowanie histogramu dla JEDNEJ, wybranej średnicy
+# -------------------------------------------------------
+# 2. Interaktywny wybór w konsoli
+print(f"Dostępne izotopy: {df['Izotop'].unique()}")
+wybrany_izotop = input("Wpisz nazwę izotopu: ")
+
+print(f"Dostępne średnice sfery (mm): {df['Srednica_mm'].unique()}")
+wybrana_srednica = float(input("Wpisz średnicę sfery: "))
+# Weryfikacja poprawności wyboru
+if wybrana_srednica not in diameters_mm:
+    raise ValueError(f"Błąd: Średnica {wybrana_srednica} mm nie występuje w danych. Dostępne to: {diameters_mm}")
+
+# Filtrowanie danych tylko dla wybranej sfery
+df_wybrane = df_merged[df_merged['Srednica_mm'] == wybrana_srednica]
+
+# Obliczenie fizycznych granic sfery
+r_in = wybrana_srednica / 2.0
+r_out = r_in + wall_thickness_mm
+
+# Parametry histogramu (wspólne kosze dla obu izotopów)
+max_rf = df_wybrane['R_f'].max()
+bins = np.linspace(0, max_rf, 80)
+
+# Generowanie wykresu
+plt.figure(figsize=(10, 6))
+
+# Selektywne rysowanie histogramów
+if wybrany_izotop in ['18F']:
+    rf_18F = df_wybrane[df_wybrane['Izotop'] == '18F']['R_f']
+    plt.hist(rf_18F, bins=bins, alpha=0.6, color='royalblue', label='18F', edgecolor='black', linewidth=0.5)
+
+if wybrany_izotop in ['44Sc']:
+    rf_44Sc = df_wybrane[df_wybrane['Izotop'] == '44Sc']['R_f']
+    plt.hist(rf_44Sc, bins=bins, alpha=0.6, color='crimson', label='44Sc', edgecolor='black', linewidth=0.5)
+
+# Zaznaczenie granic materiałów
+plt.axvline(x=r_in, color='black', linestyle='--', linewidth=1.5, label='Krawędź wewn. (woda/PMMA)')
+plt.axvline(x=r_out, color='gray', linestyle=':', linewidth=1.5, label='Krawędź zewn. (PMMA/woda)')
+
+# Formatowanie
+plt.title(f'1D Histogram zasięgu pozytonów - Sfera {wybrana_srednica} mm ({wybrany_izotop})', fontsize=14, fontweight='bold')
+plt.xlabel('Odległość anihilacji od środka (R_f) [mm]', fontsize=12)
+plt.ylabel('Liczba zdarzeń', fontsize=12)
+plt.legend(fontsize=11)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.xlim(0, max_rf)
+
+plt.tight_layout()
+nazwa_pliku = f"./wygenerowane_dane/histogram_{wybrany_izotop}_{wybrana_srednica}mm.png"
+
+# Zapis wykresu do pliku PNG (dodano dpi=300 dla wysokiej jakości)
+plt.savefig(nazwa_pliku, format='png', dpi=300)
+
+# Zamknięcie figury (brak wyświetlania w oknie)
+plt.close()
