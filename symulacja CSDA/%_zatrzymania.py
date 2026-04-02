@@ -75,44 +75,55 @@ for d in diameters_mm:
             })
 
 df_plot = pd.DataFrame(dane_wykres)
-# Tworzenie połączonej etykiety do legendy
+# Tworzenie połączonej etykiety do legendy (nie jest już kluczowa, ale zostawiamy)
 df_plot['Grupa'] = df_plot['Średnica'] + ' - ' + df_plot['Izotop']
 
-# 2. Rysowanie wspólnego wykresu
-plt.figure(figsize=(14, 7))
+# 2. Rysowanie wykresów w siatce 2x3
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(18, 12))
+axes = axes.flatten()  # Spłaszczamy tablicę osi, aby ułatwić iterację
 
-# Używamy seaborn do automatycznego pogrupowania słupków obok siebie
-ax = sns.barplot(
-    data=df_plot, 
-    x='Miejsce', 
-    y='Udział [%]', 
-    hue='Grupa', 
-    edgecolor='black'
-)
+for i, d in enumerate(diameters_mm):
+    ax = axes[i]
+    # Filtrowanie danych tylko dla konkretnej średnicy
+    df_sub = df_plot[df_plot['Średnica'] == f'{d} mm']
+    
+    sns.barplot(
+        data=df_sub, 
+        x='Miejsce', 
+        y='Udział [%]', 
+        hue='Izotop',  # Średnicę mamy w tytule, więc tu grupujemy tylko po izotopie
+        edgecolor='black',
+        ax=ax
+    )
 
-# Funkcja do dodawania etykiet na słupkach
-for p in ax.patches:
-    height = p.get_height()
-    # seaborn tworzy puste słupki (nan) tam, gdzie nie ma danych, więc trzeba to obsłużyć
-    if not np.isnan(height) and height > 0:
-        ax.annotate(f'{height:.1f}%', 
-                    (p.get_x() + p.get_width() / 2., height),
-                    ha='center', va='bottom', fontsize=8, fontweight='bold', 
-                    xytext=(0, 3), textcoords='offset points', rotation=90)
+    # Funkcja do dodawania etykiet na słupkach dla danego podwykresu
+    for p in ax.patches:
+        height = p.get_height()
+        if not np.isnan(height) and height > 0:
+            ax.annotate(f'{height:.1f}%', 
+                        (p.get_x() + p.get_width() / 2., height),
+                        ha='center', va='bottom', fontsize=9, fontweight='bold', 
+                        xytext=(0, 3), textcoords='offset points')
 
-# Formatowanie
-plt.title('Miejsce anihilacji pozytonów - Wszystkie średnice (18F vs 44Sc)', fontsize=14, fontweight='bold')
-plt.ylabel('Udział [%]', fontsize=12)
-plt.xlabel('')
-plt.legend(title='Średnica - Izotop', bbox_to_anchor=(1.01, 1), loc='upper left', fontsize=10)
-plt.grid(axis='y', linestyle='--', alpha=0.7)
+    # Formatowanie pojedynczego podwykresu
+    ax.set_title(f'Średnica: {d} mm', fontsize=12, fontweight='bold')
+    ax.set_xlabel('')
+    ax.set_ylabel('Udział [%]' if i % 3 == 0 else '') # Y label tylko dla lewej kolumny
+    
+    # Stała oś Y [0, 110] na wszystkich wykresach dla rzetelnego porównania
+    ax.set_ylim(0, 110) 
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Zostawiamy legendę tylko na pierwszym wykresie, aby nie śmiecić
+    if i == 0:
+        ax.legend(title='Izotop', loc='upper right')
+    else:
+        ax.get_legend().remove()
 
-# Dynamiczne skalowanie osi Y
-max_y = df_plot['Udział [%]'].max() if not df_plot.empty else 100
-plt.ylim(0, max_y + 15)
-
+# Tytuł główny dla całej figury
+plt.suptitle('Miejsce anihilacji pozytonów (18F vs 44Sc) w zależności od średnicy sfery', fontsize=16, fontweight='bold')
 plt.tight_layout()
 
 # Zapis zbiorczego wykresu
-plt.savefig('./dane_symulacja_CSDA/porownanie_anihilacji_wszystkie.png', format='png', dpi=300)
+plt.savefig('./dane_symulacja_CSDA/porownanie_anihilacji_siatka.png', format='png', dpi=300)
 plt.close()
