@@ -20,7 +20,7 @@ results_18F = []
 results_44Sc = []
 list_of_df =[]
 
-df = pd.read_csv("./wygenerowane_dane/Generacja_danych.csv")
+df = pd.read_csv("./dane_symulacja_CSDA/Generacja_danych.csv")
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
 N_sim = int(len(df)/len(grouped_df))
 for (iso, d), group in grouped_df:
@@ -99,9 +99,4 @@ for (iso, d), group in grouped_df:
         results_44Sc.append(row)
 
 final_df = pd.concat(list_of_df)
-final_df.to_csv("./wygenerowane_dane/wyniki_symulacji.csv", index=False)
-
-print("\n=== WYNIKI DLA FLUORU (18F) ===")
-print(pd.DataFrame(results_18F).to_string(index=False))
-print("\n=== WYNIKI DLA SKANDU (44Sc) ===")
-print(pd.DataFrame(results_44Sc).to_string(index=False))
+final_df.to_csv("./dane_symulacja_CSDA/wyniki_symulacji.csv", index=False)
