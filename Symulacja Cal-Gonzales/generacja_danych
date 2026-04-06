@@ -29,12 +29,10 @@ def beta_plus_spectrum(E, E0, Z):  # (energia, energia maksymalna, liczba atomow
     F = fermi_function_allowed(Z, E)
     return p * E * (E0 - E)**2 * F
 
-def compute_r(E): # TUTAJ NAPISAĆ SKĄD WZÓR
-    return 0.412 * E**(1.265 - 0.0954 * np.log(E)) # zwraca odpowiedź w [cm]
-
-def compute_X(E):
-    fromMMtoCM = 10 
-    return (compute_r(E) / rho_water) * fromMMtoCM  # Zasięg bazowy ekwiwalentny wodzie w mm, *10 
+def compute_R_mean(E):
+    fromMMtoCM = 10
+    # Obliczamy bazowy zasięg dla wody. Korekta na plastik nastąpi w pętli.
+    return (0.108 * E**1.14 / rho_water) * fromMMtoCM
 
 def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sampli
     startOfRange = 0.01
@@ -84,7 +82,7 @@ for iso, (E0, Z) in isotopes.items():
 
         # 3. Zasięg bazowy (wodny)
         E_sampled = sample_energies(E0, Z, N_sim)
-        X_range = compute_X(E_sampled)
+        X_range = compute_R_mean(E_sampled)
 
         # --- Koniec generacji
 
@@ -97,7 +95,7 @@ for iso, (E0, Z) in isotopes.items():
 
 
 final_df = pd.concat(list_of_df)
-final_df.to_csv("./dane_symulacja_CSDA/Generacja_danych.csv", index=False)
+final_df.to_csv("./dane_symulacja_cal_gonzales/Generacja_danych_c-g.csv", index=False)
 
 # TODO: Inny plik
 #TO DO WYRYSOWAĆ X0, Y0, Z0, r_pos, theta_pos, cos_phi_pos, sin_phi_pos
