@@ -53,6 +53,7 @@ def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sa
 # -------------------------------------------------------
 # Symulacja Monte Carlo z geometrią sfery (woda -> plastik -> woda)
 # -------------------------------------------------------
+list_of_hist_df = []
 list_of_df = []
 global_idx = 0
 for iso, (E0, Z) in isotopes.items():
@@ -66,7 +67,9 @@ for iso, (E0, Z) in isotopes.items():
         theta_pos = 2 * np.pi * np.random.rand(N_sim)
         cos_phi_pos = 1 - 2 * np.random.rand(N_sim)
         sin_phi_pos = np.sqrt(1 - cos_phi_pos**2)
-        
+
+        phi_pos = np.arccos(cos_phi_pos)
+
         x0 = r_pos * sin_phi_pos * np.cos(theta_pos)
         y0 = r_pos * sin_phi_pos * np.sin(theta_pos)
         z0 = r_pos * cos_phi_pos
@@ -88,6 +91,20 @@ for iso, (E0, Z) in isotopes.items():
 
         # --- Koniec generacji
         n = np.arange(global_idx, global_idx + N_sim)
+
+                # Wyciągamy tylko parametry przestrzenne do weryfikacji
+        data_hist = {
+            'Srednica_mm': d,
+            'r': r_pos,
+            'theta': theta_pos,
+            'phi': phi_pos,
+            'x': x0,
+            'y': y0,
+            'z': z0
+        }
+        df_hist = pd.DataFrame(data_hist)
+        list_of_hist_df.append(df_hist)
+
         data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
         df = pd.DataFrame(data)
 
@@ -98,7 +115,8 @@ for iso, (E0, Z) in isotopes.items():
 
 final_df = pd.concat(list_of_df)
 final_df.to_csv("./dane_symulacja_CSDA/Generacja_danych.csv", index=False)
-
+final_hist_df = pd.concat(list_of_hist_df)
+final_hist_df.to_csv("./dane_symulacja_CSDA/histogramy_weryfikacja.csv", index=False)
 # TODO: Inny plik
 #TO DO WYRYSOWAĆ X0, Y0, Z0, r_pos, theta_pos, cos_phi_pos, sin_phi_pos
 # #Jak w :194 zrobić rysunki kontrolne - wektorki kierunku
