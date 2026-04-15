@@ -21,13 +21,13 @@ def fermi_function_allowed(Z, E):
     alpha = 1/137
     p = momentum(E)
     p = np.where(p==0, 1e-9, p)
-    eta = alpha * Z * (E + m_e) / p
+    eta = - alpha * Z * (E + m_e) / p
     return (2 * np.pi * eta) / (1 - np.exp(-2 * np.pi * eta))
 
 def beta_plus_spectrum(E, E0, Z):  # (energia, energia maksymalna, liczba atomowa)
     p = momentum(E)
     F = fermi_function_allowed(Z, E)
-    return p * E * (E0 - E)**2 * F
+    return p * (E + m_e) * (E0 - E)**2 * F
 
 def compute_R_mean(E):
     fromMMtoCM = 10
