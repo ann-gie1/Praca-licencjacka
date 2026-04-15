@@ -52,7 +52,7 @@ def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sa
 # Symulacja Monte Carlo z geometrią sfery (woda -> plastik -> woda)
 # -------------------------------------------------------
 list_of_df = []
-n = np.array([i for i in range(100)])
+global_idx = 0
 for iso, (E0, Z) in isotopes.items():
     for d in diameters_mm:
         # DODAĆ SYMULACJĘ EVENT BY EVENT < - niski priorytet
@@ -85,13 +85,13 @@ for iso, (E0, Z) in isotopes.items():
         X_range = compute_R_mean(E_sampled)
 
         # --- Koniec generacji
-
+        n = np.arange(global_idx, global_idx + N_sim)
         data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
         df = pd.DataFrame(data)
 
         list_of_df.append(df)
 
-        n = n+100
+        global_idx += N_sim
 
 
 final_df = pd.concat(list_of_df)
