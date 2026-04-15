@@ -74,9 +74,11 @@ for (iso, d), group in grouped_df:
     yf = y0 + d_actual * dy
     zf = z0 + d_actual * dz
     Rf = np.sqrt(xf**2 + yf**2 + zf**2)
+
+    kategorie = np.select([mask1, mask2, mask3], ['Wewnątrz', 'W materiale', 'Na zewnątrz'], default='Błąd')
     
     # TUTAJ ZROBIC DUMP DO PLIKU. FORMAT DO USTALENIA
-    data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'xf': xf, 'yf': yf, 'zf': zf}
+    data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'xf': xf, 'yf': yf, 'zf': zf, 'Kategoria': kategorie}
     df_MC = pd.DataFrame(data)
 
     list_of_df.append(df_MC)
