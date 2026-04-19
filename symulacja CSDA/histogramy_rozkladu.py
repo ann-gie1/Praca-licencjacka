@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # 1. Wczytanie danych
-plik_wejsciowy = "./dane_symulacja_cal_gonzales/histogramy_weryfikacja.csv"
+plik_wejsciowy = "./dane_symulacja_CSDA/histogramy_weryfikacja.csv"
 df = pd.read_csv(plik_wejsciowy)
 
 # Wybieramy tylko jedną średnicę, żeby r się nie nałożyły z różnych kul
