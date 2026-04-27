@@ -39,15 +39,13 @@ def compute_X(E):
 def sample_energies(E0, Z, N): # energia maksymalna, liczba atomowa  i liczba sampli
     startOfRange = 0.01
     endOfRange = 5000
+
     # TO DO, dodać liczenie maksymalnej energii emisji
     E_grid = np.linspace(startOfRange, E0, endOfRange)
-    print( E_grid )
     spectrum = beta_plus_spectrum(E_grid, E0, Z)
-    print( spectrum )
     cdf = np.cumsum(spectrum)
-    print (cdf)
     cdf = cdf / cdf[-1]
-    print (cdf)
+    
     return np.interp(np.random.rand(N), cdf, E_grid)
 
 # -------------------------------------------------------
@@ -114,9 +112,9 @@ for iso, (E0, Z) in isotopes.items():
 
 
 final_df = pd.concat(list_of_df)
-final_df.to_csv("./dane_symulacja_CSDA/Generacja_danych.csv", index=False)
+final_df.to_csv("../dane_symulacja_CSDA/Generacja_danych.csv", index=False)
 final_hist_df = pd.concat(list_of_hist_df)
-final_hist_df.to_csv("./dane_symulacja_CSDA/histogramy_weryfikacja.csv", index=False)
+final_hist_df.to_csv("../dane_symulacja_CSDA/histogramy_weryfikacja.csv", index=False)
 # TODO: Inny plik
 #TO DO WYRYSOWAĆ X0, Y0, Z0, r_pos, theta_pos, cos_phi_pos, sin_phi_pos
 # #Jak w :194 zrobić rysunki kontrolne - wektorki kierunku
