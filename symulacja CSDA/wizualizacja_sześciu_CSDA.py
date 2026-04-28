@@ -138,6 +138,6 @@ for wybrany_izotop in dostepne_izotopy:
     )
 
     # Zapis do pliku HTML zamiast wyświetlania w locie na serwerze
-    sciezka_wyjsciowa = f"../dane_symulacja_CSDA/wizualizacja_{wybrany_izotop}_1mln.html"
-    fig.write_html(sciezka_wyjsciowa)
+    sciezka_wyjsciowa = f"../dane_symulacja_CSDA/wizualizacja_{wybrany_izotop}_1mln.json"
+    fig.write_json(sciezka_wyjsciowa)
     print(f"Zapisano wizualizację do pliku: {sciezka_wyjsciowa}")
