@@ -12,7 +12,7 @@ wall_thickness_mm = 1.0   # Grubość ścianki w [mm] (zmień na 10.0 jeśli ser
 
 isotopes = {"18F": (0.634, 8), "44Sc": (1.474, 20)} # max energia emisji, liczba atomowa isotopu <<< DO SPRAWDZENIA :)
 diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
-N_sim = 100
+N_sim = 1000000
 
 def momentum(E): # założenie: liczymy tylko dla elektronu
     return np.sqrt(E**2 + 2 * m_e * E) # liczenie pędu
@@ -108,9 +108,9 @@ for iso, (E0, Z) in isotopes.items():
 
 
 final_df = pd.concat(list_of_df)
-final_df.to_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g.csv", index=False)
+final_df.to_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln.csv", index=False)
 final_hist_df = pd.concat(list_of_hist_df)
-final_hist_df.to_csv("../dane_symulacja_cal_gonzales/histogramy_weryfikacja.csv", index=False)
+final_hist_df.to_csv("../dane_symulacja_cal_gonzales/histogramy_weryfikacja_1mln.csv", index=False)
 # TODO: Inny plik
 #TO DO WYRYSOWAĆ X0, Y0, Z0, r_pos, theta_pos, cos_phi_pos, sin_phi_pos
 # #Jak w :194 zrobić rysunki kontrolne - wektorki kierunku
