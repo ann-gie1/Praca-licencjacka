@@ -3,7 +3,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # 1. Wczytanie danych
-plik_wejsciowy = "./from_server/dane_symulacja_cal_gonzales/histogramy_weryfikacja_1mln.csv"
+plik_wejsciowy = "../dane_symulacja_cal_gonzales/histogramy_weryfikacja_1mln.csv"
+plik_wyjsciowy = "../dane_symulacja_cal_gonzales/histogramy_weryfikacja_1mln.png"
 df = pd.read_csv(plik_wejsciowy)
 
 # Wybieramy tylko jedną średnicę, żeby r się nie nałożyły z różnych kul
@@ -52,4 +53,5 @@ fig.update_layout(
     template="plotly_white"
 )
 
-fig.show()
+fig.write_image(plik_wyjsciowy)
+print(f"Gotowe. Wykres zapisano w: {plik_wyjsciowy}")

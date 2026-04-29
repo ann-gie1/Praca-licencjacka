@@ -2,7 +2,8 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # 1. Wczytanie danych
-plik_wejsciowy = "./dane_symulacja_cal_gonzales/Generacja_danych_c-g.csv"
+plik_wejsciowy = "../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln.csv"
+plik_wyjsciowy = "../dane_symulacja_cal_gonzales/histogram_energii_1mln.png"
 df = pd.read_csv(plik_wejsciowy)
 
 # 2. Tworzenie histogramu 1D
@@ -16,4 +17,5 @@ fig.update_layout(
 )
 
 # 4. Wyświetlenie wykresu
-fig.show()
+fig.write_image(plik_wyjsciowy)
+print(f"Gotowe. Wykres zapisano w: {plik_wyjsciowy}")
