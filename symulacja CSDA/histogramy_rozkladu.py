@@ -3,8 +3,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 # 1. Wczytanie danych
-plik_wejsciowy = "./dane_symulacja_CSDA/histogramy_weryfikacja.csv"
-plik_wyjsciowy = "./dane_symulacja_CSDA/histogramy_weryfikacja.png"
+plik_wejsciowy = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.csv"
+plik_wyjsciowy = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.png"
 
 df = pd.read_csv(plik_wejsciowy)
 
