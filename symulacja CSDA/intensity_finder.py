@@ -8,7 +8,7 @@ import os
 
 def main():
     # Szukamy wszystkich plików NIfTI wygenerowanych przez poprzedni skrypt
-    sciezka_szukania = "../dane_symulacja_CSDA/symulacja_NEMA_*.nii.gz"
+    sciezka_szukania = "../dane_symulacja_CSDA/symulacja_conc_NEMA_*.nii.gz"
     pliki_nifti = glob.glob(sciezka_szukania)
 
     if not pliki_nifti:

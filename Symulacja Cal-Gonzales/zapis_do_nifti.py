@@ -8,8 +8,8 @@ def main():
     print("Wczytywanie danych symulacyjnych...")
     
     # 1. Wczytanie danych
-    df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln.csv")
-    df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln.csv")
+    df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv")
+    df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln-conc.csv")
 
     df_all = pd.merge(df, df1, on='Index', suffixes=('', '_wyniki'))
 
@@ -81,7 +81,7 @@ def main():
         img_sitk = sitk.GetImageFromArray(np.transpose(volume, (2, 1, 0)))
         img_sitk.SetSpacing((spacing, spacing, spacing))
 
-        plik_wyjsciowy = f"../dane_symulacja_cal_gonzales/symulacja_NEMA_{wybrany_izotop}.nii.gz"
+        plik_wyjsciowy = f"../dane_symulacja_cal_gonzales/symulacja_conc_NEMA_{wybrany_izotop}.nii.gz"
         sitk.WriteImage(img_sitk, plik_wyjsciowy)
 
         print(f"Zapisano NIfTI dla {wybrany_izotop} -> {plik_wyjsciowy}")

@@ -4,8 +4,8 @@ import plotly.graph_objects as go
 import os
 
 # 1. Wczytanie danych
-df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln.csv")
-df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln.csv")
+df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv")
+df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln-conc.csv")
 
 # Łączenie plików
 df_all = pd.merge(df, df1, on='Index', suffixes=('', '_wyniki'))
@@ -138,6 +138,6 @@ for wybrany_izotop in dostepne_izotopy:
     )
 
     # Zapis do pliku HTML zamiast wyświetlania w locie na serwerze
-    sciezka_wyjsciowa = f"../dane_symulacja_cal_gonzales/wizualizacja_{wybrany_izotop}_1mln.json"
+    sciezka_wyjsciowa = f"../dane_symulacja_cal_gonzales/wizualizacja_{wybrany_izotop}_1mln-conc.html"
     fig.write_json(sciezka_wyjsciowa)
     print(f"Zapisano wizualizację do pliku: {sciezka_wyjsciowa}")
