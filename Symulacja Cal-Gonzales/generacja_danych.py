@@ -58,6 +58,7 @@ for iso, (E0, Z) in isotopes.items():
         
         # Koncentracja: Objętość skaluje się z sześcianem średnicy
         N_sim = int(base_N_sim * (d / base_diameter_mm)**3)
+        print(f"[{iso}] Generuję sferę {d} mm... Liczba zdarzeń: {N_sim}")
         
         R_in = d / 2.0
         R_out = R_in + wall_thickness_mm
