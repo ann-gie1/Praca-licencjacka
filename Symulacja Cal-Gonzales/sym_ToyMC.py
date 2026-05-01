@@ -27,7 +27,7 @@ if os.path.exists(output_csv):
     os.remove(output_csv)
 
 print("Wczytywanie pliku z wygenerowanymi danymi (to może chwilę potrwać)...")
-df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych__c-g_1mln-conc.csv")
+df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv")
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
 
 for (iso, d), group in grouped_df:
