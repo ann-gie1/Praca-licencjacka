@@ -1,4 +1,4 @@
-## poprawka na średnice
+import os
 import numpy as np
 import pandas as pd
 
@@ -8,31 +8,39 @@ import pandas as pd
 m_e = 0.511                 # masa elektronu w [MeV/c2]
 rho_water = 1.0           # gęstość wody [g/cm^3]
 rho_plastic = 1.18        # gęstość plastiku (np. PMMA/Akryl) [g/cm^3]
-wall_thickness_mm = 1.0   # Grubość ścianki w [mm] (zmień na 10.0 jeśli serio miały to być "cm")
+wall_thickness_mm = 1.0   # Grubość ścianki w [mm]
 
-isotopes = {"18F": (0.634, 8), "44Sc": (1.474, 20)} # max energia emisji, liczba atomowa isotopu <<< DO SPRAWDZENIA :)
+isotopes = {"18F": (0.634, 8), "44Sc": (1.474, 20)} 
 diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
 
 # -------------------------------------------------------
-# Symulacja Monte Carlo z geometrią sfery (woda -> plastik -> woda)
+# Symulacja Monte Carlo z geometrią sfery
 # -------------------------------------------------------
 results_18F = []
 results_44Sc = []
-list_of_df =[]
 
-df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv")
+output_csv = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc.csv"
+output_metrics_csv = "../dane_symulacja_CSDA/metryki_1mln-conc.csv"
+
+# Usuwamy stary plik przed startem, aby dopisywanie (mode='a') go nie podwoiło
+if os.path.exists(output_csv):
+    os.remove(output_csv)
+
+print("Wczytywanie pliku z wygenerowanymi danymi (to może chwilę potrwać)...")
+df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv")
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
-N_sim = int(len(df)/len(grouped_df))
+
 for (iso, d), group in grouped_df:
-    # Skip if the group doesn't match your target isotopes or diameters
     if iso not in isotopes or d not in diameters_mm:
         continue
-
+    
+    current_N_sim = len(group)
+    print(f"[{iso}] Przetwarzanie i zapis sfery {d} mm... Zdarzeń: {current_N_sim}")
+    
     R_in = d / 2.0
     R_out = R_in + wall_thickness_mm
     
     n = group['Index']
-    # Extract data directly from the subset (O(1) operation)
     x0 = group['x']
     y0 = group['y']
     z0 = group['z']
@@ -41,31 +49,24 @@ for (iso, d), group in grouped_df:
     dz = group['dz']
     X_range = group['Range']
 
-    # 4. Ray-tracing: Przecięcie promienia ze sferą wewnętrzną i zewnętrzną
+    # 4. Ray-tracing
     b = x0*dx + y0*dy + z0*dz
     r2 = x0**2 + y0**2 + z0**2
     
-    t1 = -b + np.sqrt(b**2 - (r2 - R_in**2))   # Dystans do wewnętrznej ścianki plastiku
-    t2 = -b + np.sqrt(b**2 - (r2 - R_out**2))  # Dystans do zewnętrznej ścianki plastiku
+    t1 = -b + np.sqrt(b**2 - (r2 - R_in**2))   
+    t2 = -b + np.sqrt(b**2 - (r2 - R_out**2))  
     
-    # DODAĆ RYSUNKI JAK GRAFICZNIE WYGLĄDA POSZUKIWANIE
-
-    # 5. Obliczanie właściwego dystansu z uwzględnieniem gęstości plastiku
-    W_plastic = (t2 - t1) * (rho_plastic / rho_water) # Koszt przejścia przez plastik w ekwiwalencie wodnym
+    # 5. Obliczanie właściwego dystansu
+    W_plastic = (t2 - t1) * (rho_plastic / rho_water) 
     
-    # DO PRZEMYŚLENIA
-
-    d_actual = np.zeros(N_sim)
+    d_actual = np.zeros(current_N_sim)
     
-    # Zatrzymuje się w wodzie wewnętrznej
     mask1 = X_range <= t1
     d_actual[mask1] = X_range[mask1]
     
-    # Zatrzymuje się w plastiku
     mask2 = (X_range > t1) & (X_range <= t1 + W_plastic)
     d_actual[mask2] = t1[mask2] + (X_range[mask2] - t1[mask2]) * (rho_water / rho_plastic)
     
-    # Przebija plastik i anihiluje w wodzie na zewnątrz
     mask3 = X_range > t1 + W_plastic
     d_actual[mask3] = t2[mask3] + (X_range[mask3] - t1[mask3] - W_plastic[mask3])
     
@@ -74,20 +75,19 @@ for (iso, d), group in grouped_df:
     yf = y0 + d_actual * dy
     zf = z0 + d_actual * dz
     Rf = np.sqrt(xf**2 + yf**2 + zf**2)
-
-    kategorie = np.select([mask1, mask2, mask3], ['Wewnątrz', 'W materiale', 'Na zewnątrz'], default='Błąd')
     
-    # TUTAJ ZROBIC DUMP DO PLIKU. FORMAT DO USTALENIA
-    data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'xf': xf, 'yf': yf, 'zf': zf, 'Kategoria': kategorie}
+    data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'xf': xf, 'yf': yf, 'zf': zf}
     df_MC = pd.DataFrame(data)
 
-    list_of_df.append(df_MC)
+    # Zapis wyników do CSV "w locie"
+    write_header = not os.path.exists(output_csv)
+    df_MC.to_csv(output_csv, mode='a', header=write_header, index=False)
 
     # 7. Metryki
-    # Spill-out dotyczy opuszczenia aktywnej objętości wewnętrznej (R_in)
-    spill_out_percent = (np.sum(Rf > R_in) / N_sim) * 100.0
+    spill_out_percent = (np.sum(Rf > R_in) / current_N_sim) * 100.0
     
     row = {
+        "Izotop": iso,
         "Średnica sfery [mm]": d,
         "Max R końcowy [mm]": round(np.max(Rf), 3),
         "Średni R końcowy [mm]": round(np.mean(Rf), 3),
@@ -100,5 +100,13 @@ for (iso, d), group in grouped_df:
     else:
         results_44Sc.append(row)
 
-final_df = pd.concat(list_of_df)
-final_df.to_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln-conc.csv", index=False)
+    # Agresywne zwalnianie pamięci tymczasowej wewnątrz pętli
+    del df_MC, data, d_actual, mask1, mask2, mask3
+    del b, r2, t1, t2, W_plastic, xf, yf, zf, Rf
+
+# Zapisanie zebranych metryk do osobnego pliku
+df_metrics = pd.DataFrame(results_18F + results_44Sc)
+df_metrics.to_csv(output_metrics_csv, index=False)
+
+print("\nSymulacja zakończona! Zebrane metryki:")
+print(df_metrics)
