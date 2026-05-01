@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 
@@ -16,6 +17,16 @@ diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
 # Baza do obliczeń koncentracji
 base_diameter_mm = 10.0
 base_N_sim = 1000000
+
+# Ścieżki wyjściowe
+output_csv = "../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv"
+output_hist_csv = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.csv"
+
+# Usuwamy stary plik główny przed startem pętli
+if os.path.exists(output_csv):
+    os.remove(output_csv)
+# if os.path.exists(output_hist_csv): 
+#     os.remove(output_hist_csv)
 
 def momentum(E):
     return np.sqrt(E**2 + 2 * m_e * E)
@@ -53,16 +64,13 @@ def sample_energies(E0, Z, N):
 # -------------------------------------------------------
 # Symulacja Monte Carlo
 # -------------------------------------------------------
-list_of_hist_df = []
-list_of_df = []
 global_idx = 0
 
 for iso, (E0, Z) in isotopes.items():
     for d in diameters_mm:
         
-        # Koncentracja: Objętość skaluje się z sześcianem średnicy
         N_sim = int(base_N_sim * (d / base_diameter_mm)**3)
-        print(f"[{iso}] Generuję sferę {d} mm... Liczba zdarzeń: {N_sim}")
+        print(f"[{iso}] Generuję i zapisuję sferę {d} mm... Liczba zdarzeń: {N_sim}")
         
         R_in = d / 2.0
         R_out = R_in + wall_thickness_mm
@@ -95,37 +103,29 @@ for iso, (E0, Z) in isotopes.items():
         # --- Koniec generacji
         n = np.arange(global_idx, global_idx + N_sim)
 
-        data_hist = {
-            'Srednica_mm': d,
-            'r': r_pos,
-            'theta': theta_pos,
-            'phi': phi_pos,
-            'x': x0,
-            'y': y0,
-            'z': z0
-        }
-        df_hist = pd.DataFrame(data_hist)
-        list_of_hist_df.append(df_hist)
-
+        # --- Zapis głównych danych ---
         data = {
-            'Index': n, 
-            'Izotop': iso,
-            'Srednica_mm': d,
-            'x': x0, 
-            'y': y0, 
-            'z': z0, 
-            'dx': dx, 
-            'dy': dy, 
-            'dz': dz, 
-            'Energia-wylosowana': E_sampled, 
-            'Range': X_range
+            'Index': n, 'Izotop': iso, 'Srednica_mm': d,
+            'x': x0, 'y': y0, 'z': z0, 
+            'dx': dx, 'dy': dy, 'dz': dz, 
+            'Energia-wylosowana': E_sampled, 'Range': X_range
         }
         df = pd.DataFrame(data)
+        
+        write_header = not os.path.exists(output_csv)
+        df.to_csv(output_csv, mode='a', header=write_header, index=False)
 
-        list_of_df.append(df)
+        # --- Zapis histogramów (odkomentuj jeśli jednak potrzebujesz) ---
+        # data_hist = {'Srednica_mm': d, 'r': r_pos, 'theta': theta_pos, 'phi': phi_pos, 'x': x0, 'y': y0, 'z': z0}
+        # df_hist = pd.DataFrame(data_hist)
+        # write_hist_header = not os.path.exists(output_hist_csv)
+        # df_hist.to_csv(output_hist_csv, mode='a', header=write_hist_header, index=False)
+        # del df_hist, data_hist
+        
         global_idx += N_sim
 
-final_df = pd.concat(list_of_df)
-final_df.to_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv", index=False)
-#final_hist_df = pd.concat(list_of_hist_df)
-#final_hist_df.to_csv("../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.csv", index=False)
+        # Zwalnianie pamięci
+        del df, data
+        del x0, y0, z0, dx, dy, dz, E_sampled, X_range, r_pos, theta_pos, cos_phi_pos, sin_phi_pos, phi_pos, theta_dir, cos_phi_dir, sin_phi_dir
+
+print("Zakończono pomyślnie!")

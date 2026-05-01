@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 
@@ -53,12 +54,18 @@ list_of_hist_df = []
 list_of_df = []
 global_idx = 0
 
+
+output_csv = "../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv"
+
+# Usuwamy stary plik, żeby nie dopisywać danych w nieskończoność
+if os.path.exists(output_csv):
+    os.remove(output_csv)
+
 for iso, (E0, Z) in isotopes.items():
     for d in diameters_mm:
         
-        # Koncentracja: Objętość skaluje się z sześcianem średnicy
         N_sim = int(base_N_sim * (d / base_diameter_mm)**3)
-        print(f"[{iso}] Generuję sferę {d} mm... Liczba zdarzeń: {N_sim}")
+        print(f"[{iso}] Generuję i zapisuję sferę {d} mm... Liczba zdarzeń: {N_sim}")
         
         R_in = d / 2.0
         R_out = R_in + wall_thickness_mm
@@ -73,8 +80,6 @@ for iso, (E0, Z) in isotopes.items():
         y0 = r_pos * sin_phi_pos * np.sin(theta_pos)
         z0 = r_pos * cos_phi_pos
         
-        phi_pos = np.arccos(cos_phi_pos)
-
         # 2. Losowanie kierunku
         theta_dir = 2 * np.pi * np.random.rand(N_sim)
         cos_phi_dir = 1 - 2 * np.random.rand(N_sim)
@@ -84,33 +89,29 @@ for iso, (E0, Z) in isotopes.items():
         dy = sin_phi_dir * np.sin(theta_dir)
         dz = cos_phi_dir
         
-        # Parametry przestrzenne do weryfikacji
-        data_hist = {
-            'Srednica_mm': d,
-            'r': r_pos,
-            'theta': theta_pos,
-            'phi': phi_pos,
-            'x': x0,
-            'y': y0,
-            'z': z0
-        }
-        df_hist = pd.DataFrame(data_hist)
-        list_of_hist_df.append(df_hist)    
-
-        # 3. Zasięg bazowy (wodny)
+        # 3. Zasięg bazowy
         E_sampled = sample_energies(E0, Z, N_sim)
         X_range = compute_R_mean(E_sampled)
 
-        # --- Koniec generacji
+        # --- Koniec generacji, tworzymy DataFrame i od razu zapisujemy
         n = np.arange(global_idx, global_idx + N_sim)
-        data = {'Index': n, 'Izotop': iso,'Srednica_mm': d,'x': x0, 'y': y0, 'z': z0, 'dx': dx, 'dy': dy, 'dz': dz, 'Energia-wylosowana': E_sampled, 'Range': X_range}
+        data = {
+            'Index': n, 'Izotop': iso, 'Srednica_mm': d,
+            'x': x0, 'y': y0, 'z': z0, 
+            'dx': dx, 'dy': dy, 'dz': dz, 
+            'Energia-wylosowana': E_sampled, 'Range': X_range
+        }
         df = pd.DataFrame(data)
 
-        list_of_df.append(df)
+        # Dopisywanie do pliku 'w locie' (mode='a')
+        write_header = not os.path.exists(output_csv)
+        df.to_csv(output_csv, mode='a', header=write_header, index=False)
 
         global_idx += N_sim
 
-final_df = pd.concat(list_of_df)
-final_df.to_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv", index=False)
-#final_hist_df = pd.concat(list_of_hist_df)
-#final_hist_df.to_csv("../dane_symulacja_cal_gonzales/histogramy_weryfikacja_1mln.csv", index=False)
+        # Agresywne zwalnianie pamięci
+        del df
+        del data
+        del x0, y0, z0, dx, dy, dz, E_sampled, X_range, r_pos, theta_pos, cos_phi_pos, sin_phi_pos, theta_dir, cos_phi_dir, sin_phi_dir
+
+print("Symulacja zakończona sukcesem!")
