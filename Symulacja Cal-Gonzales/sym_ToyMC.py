@@ -19,15 +19,15 @@ diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
 results_18F = []
 results_44Sc = []
 
-output_csv = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc.csv"
-output_metrics_csv = "../dane_symulacja_CSDA/metryki_1mln-conc.csv"
+output_csv = "../dane_symulacja_cal_gonzales/wyniki_symulacji_c-g_1mln-conc.csv"
+output_metrics_csv = "../dane_symulacja_cal_gonzales/metryki_c-g_1mln-conc.csv"
 
 # Usuwamy stary plik przed startem, aby dopisywanie (mode='a') go nie podwoiło
 if os.path.exists(output_csv):
     os.remove(output_csv)
 
 print("Wczytywanie pliku z wygenerowanymi danymi (to może chwilę potrwać)...")
-df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv")
+df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych__c-g_1mln-conc.csv")
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
 
 for (iso, d), group in grouped_df:
