@@ -17,18 +17,23 @@ diameters_mm = [10, 13, 17, 22, 28, 37] # Średnice WEWNĘTRZNE (woda)
 # -------------------------------------------------------
 results_18F = []
 results_44Sc = []
-list_of_df =[]
+list_of_df = []
 
+print("Rozpoczynam wczytywanie pliku CSV (to może potrwać kilka minut)...")
 df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv")
-grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
+print(f"Pomyślnie wczytano dane: {len(df)} wierszy. Rozpoczynam grupowanie...")
 
-for (iso, d), group in grouped_df:
+grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
+total_groups = len(grouped_df)
+print(f"Dane pogrupowane (liczba grup: {total_groups}). Start symulacji ray-tracingu...\n" + "-"*50)
+
+# Używamy enumerate, żeby mieć licznik postępu (i)
+for i, ((iso, d), group) in enumerate(grouped_df, 1):
     if iso not in isotopes or d not in diameters_mm:
         continue
     
-    # POPRAWKA: Liczba zdarzeń musi być pobierana z wielkości danej grupy,
-    # ponieważ każda sfera ma teraz inną liczbę wygenerowanych cząstek.
     current_N_sim = len(group)
+    print(f"[{i}/{total_groups}] Przetwarzam: Izotop {iso}, Sfera {d} mm (liczba zdarzeń: {current_N_sim})...")
     
     R_in = d / 2.0
     R_out = R_in + wall_thickness_mm
@@ -52,7 +57,6 @@ for (iso, d), group in grouped_df:
     # 5. Obliczanie właściwego dystansu
     W_plastic = (t2 - t1) * (rho_plastic / rho_water) 
     
-    # POPRAWKA: Użycie właściwego rozmiaru tablicy dla aktualnej sfery
     d_actual = np.zeros(current_N_sim)
     
     mask1 = X_range <= t1
@@ -76,7 +80,6 @@ for (iso, d), group in grouped_df:
     list_of_df.append(df_MC)
 
     # 7. Metryki
-    # POPRAWKA: Dzielimy przez poprawną liczbę zdarzeń dla tej konkretnej sfery
     spill_out_percent = (np.sum(Rf > R_in) / current_N_sim) * 100.0
     
     row = {
@@ -92,5 +95,8 @@ for (iso, d), group in grouped_df:
     else:
         results_44Sc.append(row)
 
+print("-" * 50)
+print("Łączenie i zapisywanie wyników końcowych do pliku CSV...")
 final_df = pd.concat(list_of_df)
 final_df.to_csv("../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc.csv", index=False)
+print("Gotowe!")
