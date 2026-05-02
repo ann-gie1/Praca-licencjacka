@@ -9,7 +9,7 @@ def main():
     
     # 1. OPTYMALIZACJA: Wczytujemy TYLKO plik z wynikami końcowymi (xf, yf, zf)
     # Z poprzedniego kroku wiemy, że izotop i średnica są już w tym pliku.
-    df_all = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln-conc.csv")
+    df_all = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_c-g_1mln-conc.csv")
 
     # 2. Pobranie wszystkich dostępnych izotopów
     dostepne_izotopy = df_all['Izotop'].unique()

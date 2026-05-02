@@ -8,7 +8,7 @@ MAX_PUNKTOW_NA_KATEGORIE = 300
 
 print("Wczytywanie i łączenie danych...")
 df = pd.read_csv("../dane_symulacja_cal_gonzales/Generacja_danych_c-g_1mln-conc.csv")
-df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_C-G_1mln-conc.csv")
+df1 = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_c-g_1mln-conc.csv")
 
 df_all = pd.merge(df, df1, on='Index', suffixes=('', '_wyniki'))
 
