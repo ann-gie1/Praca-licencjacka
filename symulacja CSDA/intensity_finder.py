@@ -8,7 +8,7 @@ import os
 
 def main():
     # Szukamy wszystkich plików NIfTI wygenerowanych przez poprzedni skrypt
-    sciezka_szukania = "../dane_symulacja_CSDA/symulacja_conc_NEMA_*.nii.gz"
+    sciezka_szukania = "../dane_symulacja_CSDA/symulacja_conc_corrects_NEMA_*.nii.gz"
     pliki_nifti = glob.glob(sciezka_szukania)
 
     if not pliki_nifti:
@@ -24,7 +24,7 @@ def main():
         izotop = nazwa_pliku.replace("symulacja_NEMA_", "").replace(".nii.gz", "")
         
         # Ustawiamy ścieżkę wyjściową w tym samym folderze
-        output_image = f"../dane_symulacja_CSDA/symulacja_max_intensity_slice_{izotop}.png"
+        output_image = f"../dane_symulacja_CSDA/symulacja_max_intensity_slice_corr_conc_{izotop}.png"
 
         print(f"\n--- Przetwarzanie izotopu: {izotop} ---")
         
