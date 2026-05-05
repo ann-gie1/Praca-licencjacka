@@ -3,19 +3,22 @@ import numpy as np
 from scipy import ndimage
 import glob
 import os
+import csv
 
-def analyze_spheres_subpixel(input_dir="squares", output_file="wyniki_sfer_mm.txt", angles_step=5, threshold_ratio=0.5, pixel_size_mm=0.1):
-    files = glob.glob(os.path.join(input_dir, "sphere_blackbox_*.png"))
-    files = [f for f in files if "debug" not in f]
+def analyze_spheres_subpixel(input_dirs, output_file="wyniki_sfer.csv", angles_step=5, threshold_ratio=0.5):
+    files = []
+    for d in input_dirs:
+        found = glob.glob(os.path.join(d, "sphere_*.png"))
+        files.extend([f for f in found if "_debug" not in f])
     
     if not files:
-        print(f"Brak plików w '{input_dir}'.")
+        print("Brak plików w podanych ścieżkach.")
         return
 
-    with open(output_file, "w", encoding="utf-8") as file:
-        file.write("Wyniki analizy sfer (z dokładnością sub-pikselową i przeliczeniem na mm):\n")
-        file.write(f"Zastosowany przelicznik: 1 piksel = {pixel_size_mm} mm\n")
-        file.write("-" * 85 + "\n")
+    # Otwieramy plik CSV do zapisu
+    with open(output_file, mode="w", newline='', encoding="utf-8") as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(["Nazwa_pliku", "Srednica_px"]) # Nagłówki kolumn
 
         for roi_path in files:
             img = cv2.imread(roi_path, cv2.IMREAD_GRAYSCALE)
@@ -50,18 +53,14 @@ def analyze_spheres_subpixel(input_dir="squares", output_file="wyniki_sfer_mm.tx
                         radii.append(exact_r)
                         break
                         
-            if not radii:
-                avg_radius = 0
-            else:
-                avg_radius = np.mean(radii)
-                
-            # Wyliczenia
+            avg_radius = np.mean(radii) if radii else 0
             diameter_px = avg_radius * 2
-            diameter_mm = diameter_px * pixel_size_mm
             
-            result_text = f"Plik: {os.path.basename(roi_path):<25} | Średnica: {diameter_px:>6.3f} px | Średnica: {diameter_mm:>6.3f} mm"
-            print(result_text)
-            file.write(result_text + "\n")
+            file_name = os.path.basename(roi_path)
+            
+            # Zapis do CSV i wypisanie w konsoli
+            writer.writerow([file_name, f"{diameter_px:.3f}"])
+            print(f"Zapisano: {file_name} | Średnica: {diameter_px:.3f} px")
             
             # Zapis obrazków poglądowych
             debug_img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
@@ -75,5 +74,12 @@ def analyze_spheres_subpixel(input_dir="squares", output_file="wyniki_sfer_mm.tx
             debug_path = roi_path.replace(".png", "_debug.png")
             cv2.imwrite(debug_path, debug_img)
 
+# --- KONFIGURACJA ŚCIEŻEK WEJŚCIOWYCH ---
+input_directories = [
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/eksperyment",
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/Cal-gonzales",
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/CSDA"
+]
+
 # Uruchomienie
-analyze_spheres_subpixel("diameters/squares")
+analyze_spheres_subpixel(input_directories)
