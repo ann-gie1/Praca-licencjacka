@@ -6,9 +6,13 @@ import csv
 def detect_hough_special_case(image_path, output_csv_path):
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     
+    # DODANE: Stała do konwersji
+    PIXEL_TO_MM = 0.332005312085
+    
     with open(output_csv_path, "w", encoding="utf-8", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["Nazwa pliku", "Liczba sfer", "Środek X", "Środek Y", "Promień (px)", "Średnica (px)"])
+        # ZMIENIONE: Dodano kolumnę "Średnica (mm)"
+        csv_writer.writerow(["Nazwa pliku", "Liczba sfer", "Środek X", "Środek Y", "Promień (px)", "Średnica (px)", "Średnica (mm)"])
         
         base_name = os.path.basename(image_path)
         
@@ -59,16 +63,22 @@ def detect_hough_special_case(image_path, output_csv_path):
                     cv2.circle(img_color, (int(cx), int(cy)), int(r), (0, 0, 255), 2)
                     cv2.circle(img_color, (int(cx), int(cy)), 2, (0, 255, 0), 3)
                     
-                    csv_writer.writerow([base_name, num_spheres, round(cx, 3), round(cy, 3), round(r, 3), round(r*2, 3)])
+                    # DODANE: Liczenie średnicy w mm
+                    diameter_mm = (r * 2) * PIXEL_TO_MM
+                    
+                    # ZMIENIONE: Zapis nowej wartości do CSV
+                    csv_writer.writerow([base_name, num_spheres, round(cx, 3), round(cy, 3), round(r, 3), round(r*2, 3), round(diameter_mm, 3)])
             else:
-                csv_writer.writerow([base_name, 0, "Brak", "Brak", "Brak", "Brak"])
+                # ZMIENIONE: Dodano "Brak" dla nowej kolumny
+                csv_writer.writerow([base_name, 0, "Brak", "Brak", "Brak", "Brak", "Brak"])
                 
             cv2.circle(img_color, (center_x, center_y), int(max_dist_from_center), (255, 0, 0), 1)
             cv2.imwrite(f"DEBUG_HOUGH_SPECIAL_{base_name}", img_color)
             
         else:
             print(f"[{base_name}] Brak wyników.")
-            csv_writer.writerow([base_name, 0, "Brak", "Brak", "Brak", "Brak"])
+            # ZMIENIONE: Dodano "Brak" dla nowej kolumny
+            csv_writer.writerow([base_name, 0, "Brak", "Brak", "Brak", "Brak", "Brak"])
 
 # --- WYWOŁANIE ---
 zdjecie = "./python_code/nema_max_intensity_slice.png" 
