@@ -1,65 +1,89 @@
 import cv2
 import numpy as np
+from scipy import ndimage
+import glob
 import os
+import csv
 
-def extract_spheres(image_path, output_dir="squares"):
-    os.makedirs(output_dir, exist_ok=True)
+def analyze_spheres_subpixel(input_dirs, output_file="wyniki_sfer.csv", angles_step=5, threshold_ratio=0.5, pixel_size_mm=0.332005312085):
+    files = []
+    for d in input_dirs:
+        found = glob.glob(os.path.join(d, "sphere_*.png"))
+        files.extend([f for f in found if "_debug" not in f])
     
-    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    if img is None:
-        print(f"Błąd wczytywania pliku: {image_path}")
+    if not files:
+        print("Brak plików w podanych ścieżkach.")
         return
 
-    # --- ETAP 1: TWORZENIE MASKI ---
-    _, inv_img = cv2.threshold(img, 15, 255, cv2.THRESH_BINARY_INV)
-    contours_bg, _ = cv2.findContours(inv_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    main_area = max(contours_bg, key=cv2.contourArea)
-    
-    mask = np.zeros_like(img)
-    cv2.drawContours(mask, [main_area], -1, 255, thickness=cv2.FILLED)
+    # Otwieramy plik CSV do zapisu
+    with open(output_file, mode="w", newline='', encoding="utf-8") as file:
+        writer = csv.writer(file, delimiter=';')
+        # Dodano nową kolumnę dla średnicy w milimetrach
+        writer.writerow(["Nazwa_pliku", "Srednica_px", "Srednica_mm"]) 
 
-    # --- ETAP 2: ZNAJDOWANIE SFER NA MASCE ---
-    blurred = cv2.GaussianBlur(img, (5, 5), 0)
-    _, thresh = cv2.threshold(blurred, 40, 255, cv2.THRESH_BINARY)
-    masked_thresh = cv2.bitwise_and(thresh, mask)
-    
-    # Pobranie nazwy pliku bez rozszerzenia, aby nie nadpisywać plików
-    base_name = os.path.splitext(os.path.basename(image_path))[0]
-    
-    # Zapis pliku DEBUG z unikalną nazwą w folderze docelowym
-    cv2.imwrite(f"{output_dir}/DEBUG_MASKED_{base_name}.png", masked_thresh)
+        for roi_path in files:
+            img = cv2.imread(roi_path, cv2.IMREAD_GRAYSCALE)
+            if img is None: continue
+                
+            _, mask_for_com = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY)
+            center_y, center_x = ndimage.center_of_mass(mask_for_com)
+            
+            if np.isnan(center_y) or np.isnan(center_x): continue
+                
+            max_intensity = np.max(img)
+            threshold = max_intensity * threshold_ratio
+            
+            radii = []
+            max_radius = min(img.shape[0], img.shape[1]) / 2.0
+            r_vals = np.arange(0, max_radius, 0.2)
+            
+            for angle in range(0, 360, angles_step):
+                theta = np.radians(angle)
+                
+                x_vals = center_x + r_vals * np.cos(theta)
+                y_vals = center_y + r_vals * np.sin(theta)
+                
+                profile = ndimage.map_coordinates(img, [y_vals, x_vals], order=1, mode='nearest')
+                
+                for i in range(len(profile) - 1):
+                    if profile[i] >= threshold and profile[i+1] < threshold:
+                        I1, I2 = profile[i], profile[i+1]
+                        r1, r2 = r_vals[i], r_vals[i+1]
+                        
+                        exact_r = r1 + (r2 - r1) * ((threshold - I1) / (I2 - I1))
+                        radii.append(exact_r)
+                        break
+                        
+            avg_radius = np.mean(radii) if radii else 0
+            
+            # --- WYLICZENIA ŚREDNIC ---
+            diameter_px = avg_radius * 2
+            diameter_mm = diameter_px * pixel_size_mm
+            
+            file_name = os.path.basename(roi_path)
+            
+            # Zapis do CSV i wypisanie w konsoli
+            writer.writerow([file_name, f"{diameter_px:.3f}", f"{diameter_mm:.3f}"])
+            print(f"Zapisano: {file_name:<40} | Środek(X,Y): ({center_x:>6.2f}, {center_y:>6.2f}) | Średnica: {diameter_px:>6.3f} px | {diameter_mm:>6.3f} mm")
+            
+            # Zapis obrazków poglądowych
+            debug_img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+            shift = 4
+            shifted_center = (int(round(center_x * (1 << shift))), int(round(center_y * (1 << shift))))
+            shifted_radius = int(round(avg_radius * (1 << shift)))
+            
+            cv2.circle(debug_img, shifted_center, shifted_radius, (0, 0, 255), 1, cv2.LINE_AA, shift)
+            cv2.circle(debug_img, shifted_center, 1 << shift, (0, 255, 0), -1, cv2.LINE_AA, shift)
+            
+            debug_path = roi_path.replace(".png", "_debug.png")
+            cv2.imwrite(debug_path, debug_img)
 
-    contours, _ = cv2.findContours(masked_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    count = 0
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        if w > 10 and h > 10:
-            side = max(w, h) + 10
-            cx, cy = x + w//2, y + h//2
-            
-            x1 = max(0, cx - side//2)
-            y1 = max(0, cy - side//2)
-            x2 = min(img.shape[1], cx + side//2)
-            y2 = min(img.shape[0], cy + side//2)
-            
-            roi = img[y1:y2, x1:x2]
-            # Zapis wyciętych sfer z unikalną nazwą
-            cv2.imwrite(f"{output_dir}/sphere_{base_name}_{count}.png", roi)
-            count += 1
-            
-    print(f"Wyodrębniono {count} sfer z pliku {image_path}.")
-
-# --- KONFIGURACJA PLIKÓW I ŚCIEŻEK ZAPISU ---
-# Zmień poniższe stringi na właściwe ścieżki do swoich plików PNG
-tasks = [
-    ("./python_code/nema_max_intensity_slice.png", "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/eksperyment"), # Plik 1 -> Ścieżka 1
-    ("./from_server/dane_symulacja_cal_gonzales/symulacja_max_intensity_slice_symulacja_conc_NEMA_44Sc.png", "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/Cal-gonzales"), # Plik 2 -> Ścieżka 2
-    ("./from_server/dane_symulacja_cal_gonzales/symulacja_max_intensity_slice_symulacja_conc_NEMA_18F.png", "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/Cal-gonzales"), # Plik 3 -> Ścieżka 2
-    ("./from_server/dane_symulacja_CSDA/symulacja_max_intensity_slice_symulacja_conc_NEMA_44Sc.png", "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/CSDA"), # Plik 4 -> Ścieżka 3
-    ("./from_server/dane_symulacja_CSDA/symulacja_max_intensity_slice_symulacja_conc_NEMA_18F.png", "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/CSDA")  # Plik 5 -> Ścieżka 3
+# --- KONFIGURACJA ŚCIEŻEK WEJŚCIOWYCH ---
+input_directories = [
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/eksperyment",
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/Cal-gonzales",
+    "C:/Users/agieb/OneDrive/Pulpit/uni_materials/rok III/Praca licencjacka/kody_python/diameters/squares/CSDA"
 ]
 
-# Przetwarzanie w pętli
-for img_path, out_dir in tasks:
-    extract_spheres(img_path, output_dir=out_dir)
+# Uruchomienie z domyślnym przelicznikiem (1 px = 0.332005312085 mm)
+analyze_spheres_subpixel(input_directories)
