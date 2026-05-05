@@ -6,9 +6,13 @@ import csv
 def detect_spheres_intelligent_batch(image_paths, output_csv_path):
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     
+    # DODANE: Stała do konwersji
+    PIXEL_TO_MM = 0.332005312085
+    
     with open(output_csv_path, "w", encoding="utf-8", newline='') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(["Folder", "Nazwa pliku", "Liczba sfer", "Środek X", "Środek Y", "Promień (px)", "Średnica (px)"])
+        # ZMIENIONE: Dodano kolumnę "Średnica (mm)"
+        csv_writer.writerow(["Folder", "Nazwa pliku", "Liczba sfer", "Środek X", "Środek Y", "Promień (px)", "Średnica (px)", "Średnica (mm)"])
         
         for image_path in image_paths:
             folder_name = os.path.basename(os.path.dirname(image_path))
@@ -56,9 +60,15 @@ def detect_spheres_intelligent_batch(image_paths, output_csv_path):
                 for cx, cy, r in valid_circles:
                     cv2.circle(img_color, (int(cx), int(cy)), int(r), (0, 0, 255), 2)
                     cv2.circle(img_color, (int(cx), int(cy)), 2, (0, 255, 0), 3)
-                    csv_writer.writerow([folder_name, base_name, num_spheres, round(cx, 3), round(cy, 3), round(r, 3), round(r*2, 3)])
+                    
+                    # DODANE: Liczenie średnicy w mm
+                    diameter_mm = (r * 2) * PIXEL_TO_MM
+                    
+                    # ZMIENIONE: Zapis nowej zmiennej do pliku
+                    csv_writer.writerow([folder_name, base_name, num_spheres, round(cx, 3), round(cy, 3), round(r, 3), round(r*2, 3), round(diameter_mm, 3)])
             else:
-                csv_writer.writerow([folder_name, base_name, 0, "Brak", "Brak", "Brak", "Brak"])
+                # ZMIENIONE: Dodano "Brak" dla nowej kolumny
+                csv_writer.writerow([folder_name, base_name, 0, "Brak", "Brak", "Brak", "Brak", "Brak"])
                 
             # Zapis zdjęcia wynikowego
             cv2.circle(img_color, (center_x, center_y), int(max_dist), (255, 0, 0), 1)
