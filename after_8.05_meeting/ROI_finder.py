@@ -59,4 +59,4 @@ files_config = [
 
 # box_size = rozmiar wyciętego kwadratu. exclusion_radius = jak szeroko "gasimy" sferę po znalezieniu (12 pixeli powinno skutecznie oddzielić te dwie zlewające się).
 for task in files_config:
-    extract_spheres_robust(task["in"], task["out"], box_size=20, exclusion_radius=14)
+    extract_spheres_robust(task["in"], task["out"], box_size=20, exclusion_radius=12)
