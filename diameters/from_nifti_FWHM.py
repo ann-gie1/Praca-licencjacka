@@ -3,6 +3,10 @@ import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.measure import label, regionprops
+from scipy.ndimage import binary_erosion # Dodany import
+
+# Standardowe średnice sfer w fantomie NEMA IEC Body Phantom (w mm)
+TRUE_NEMA_DIAMETERS = np.array([10.0, 13.0, 17.0, 22.0, 28.0, 37.0])
 
 def measure_nema_spheres_3d_adaptive(nifti_path, show_plot=False):
     img = nib.load(nifti_path)
@@ -17,7 +21,7 @@ def measure_nema_spheres_3d_adaptive(nifti_path, show_plot=False):
     labeled_mask = label(rough_mask)
     regions = regionprops(labeled_mask, intensity_image=data)
     
-    diameters_mm = []
+    results = [] # Zmiana z diameters_mm na results (przechowuje krotki: średnica, błąd)
     final_mask = np.zeros_like(data)
     
     for prop in regions:
@@ -33,15 +37,34 @@ def measure_nema_spheres_3d_adaptive(nifti_path, show_plot=False):
                 diameter_mm = 2 * ((3 * volume_mm3) / (4 * np.pi)) ** (1/3)
                 
                 if diameter_mm < 60: 
-                    diameters_mm.append(diameter_mm)
+                    # --- WYLICZANIE BŁĘDU (Odchylenie brzegów od kuli) ---
+                    eroded_mask = binary_erosion(sphere_mask)
+                    boundary_mask = sphere_mask ^ eroded_mask # XOR: tylko brzegi
+                    bz, by, bx = np.where(boundary_mask)
+                    
+                    if len(bz) > 1:
+                        # Przeliczenie współrzędnych brzegowych na fizyczne milimetry
+                        coords_mm = np.column_stack((bz, by, bx)) * np.array(voxel_dims[:3])
+                        centroid_mm = np.mean(coords_mm, axis=0)
+                        
+                        # Odległość każdego punktu brzegowego od środka
+                        distances = np.linalg.norm(coords_mm - centroid_mm, axis=1)
+                        # Błąd średnicy to podwojone odchylenie standardowe promienia
+                        error_mm = 2 * np.std(distances, ddof=1)
+                    else:
+                        error_mm = 0.0
+                    # ---------------------------------------------------
+
+                    results.append((diameter_mm, error_mm))
                     
                     bbox = prop.bbox
-                    sphere_id = len(diameters_mm)
+                    sphere_id = len(results)
                     final_mask[bbox[0]:bbox[3], bbox[1]:bbox[4], bbox[2]:bbox[5]][sphere_mask] = sphere_id
             
-    diameters_mm.sort()
+    # Sortowanie po średnicy (rosnąco)
+    results.sort(key=lambda x: x[0])
 
-    if show_plot and len(diameters_mm) > 0:
+    if show_plot and len(results) > 0:
         z_slice = np.unravel_index(np.argmax(data), data.shape)[2]
         fig, axes = plt.subplots(1, 2, figsize=(14, 7))
         
@@ -61,11 +84,10 @@ def measure_nema_spheres_3d_adaptive(nifti_path, show_plot=False):
         plt.tight_layout()
         plt.show()
                 
-    return diameters_mm
+    return results
 
-# --- Wywołanie dla 5 plików ---
+# --- Wywołanie dla plików ---
 
-# Wprowadź tutaj ścieżki do swoich 5 plików
 input_files = [
     "./python_code/nema_volume.nii.gz",
     "./from_server/dane_symulacja_cal_gonzales/symulacja_conc_correct_NEMA_18F.nii.gz",
@@ -74,11 +96,14 @@ input_files = [
     "./from_server/dane_symulacja_CSDA/symulacja_conc_correct_NEMA_44Sc.nii.gz"
 ]
 
-output_file = "./wyniki_zbiorcze_sfery.csv"
+output_file = "./diameters/wyniki_zbiorcze_FWHM_error.csv"
+
+# Tworzenie katalogu docelowego, jeśli nie istnieje
+os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
 with open(output_file, 'w', encoding='utf-8') as f:
-    # Nagłówek powiększony o nazwę pliku
-    f.write("Plik,Sfera,Srednica_mm\n")
+    # Dodano kolumnę 'Blad_Ksztaltu_mm' do nagłówka
+    f.write("Plik,Sfera,Srednica_mm,Blad_Ksztaltu_mm,Srednica_Referencyjna_mm,Blad_Bezwzgledny_mm,Blad_Wzgledny_proc\n")
     
     for file_path in input_files:
         if not os.path.exists(file_path):
@@ -87,13 +112,18 @@ with open(output_file, 'w', encoding='utf-8') as f:
             
         print(f"Przetwarzanie: {file_path}...")
         
-        # show_plot=False aby nie zatrzymywało pętli oknem wykresu dla każdego pliku
-        measured_diameters = measure_nema_spheres_3d_adaptive(file_path, show_plot=False)
-        filename = os.path.basename(file_path) # Wyciąga samą nazwę pliku (np. "plik1.nii.gz")
+        measured_data = measure_nema_spheres_3d_adaptive(file_path, show_plot=False)
+        filename = os.path.basename(file_path) 
         
-        for i, d in enumerate(measured_diameters):
-            # Zapis z tytułem/nazwą pliku w pierwszej kolumnie
-            f.write(f"{filename},{i+1},{d:.2f}\n")
-            print(f"  {filename} - Sfera {i+1}: {d:.2f} mm")
+        for i, (d, shape_err) in enumerate(measured_data):
+            # Szukanie najbliższej wartości referencyjnej
+            true_d = TRUE_NEMA_DIAMETERS[np.argmin(np.abs(TRUE_NEMA_DIAMETERS - d))]
+            
+            # Obliczanie błędów względem referencji
+            abs_error = d - true_d
+            rel_error = (abs_error / true_d) * 100
+            
+            f.write(f"{filename},{i+1},{d:.2f},{shape_err:.2f},{true_d:.1f},{abs_error:.2f},{rel_error:.2f}\n")
+            print(f"  {filename} - Sfera {i+1}: zmierzono {d:.2f} ± {shape_err:.2f} mm | ref: {true_d:.1f} mm | błąd bezwzgl.: {abs_error:.2f} mm | błąd wzgl.: {rel_error:.2f}%")
 
 print(f"\nWszystkie wyniki zbiorczo zapisano do: {output_file}")
