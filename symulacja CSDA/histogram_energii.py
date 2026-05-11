@@ -11,16 +11,16 @@ katalog_wyjsciowy = "../dane_symulacja_CSDA/"
 df = pd.read_csv(plik_wejsciowy)
 
 # Sprawdzenie, czy kolumny istnieją (dobra praktyka)
-if 'izotop' not in df.columns or 'Energia-wylosowana' not in df.columns:
+if 'Izotop' not in df.columns or 'Energia-wylosowana' not in df.columns:
     raise ValueError("Plik CSV nie zawiera wymaganych kolumn: 'izotop' lub 'Energia-wylosowana'")
 
 # Pobranie listy unikalnych izotopów
-izotopy = df['izotop'].unique()
+izotopy = df['Izotop'].unique()
 
 # 2. Generowanie wykresów w pętli
 for izotop in izotopy:
     # Filtrowanie danych dla bieżącego izotopu
-    df_izotop = df[df['izotop'] == izotop]
+    df_izotop = df[df['Izotop'] == izotop]
     
     # Tworzenie histogramu 1D
     plt.figure(figsize=(10, 6))
