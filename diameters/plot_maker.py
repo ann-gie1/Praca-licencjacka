@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import defaultdict
 
-def generate_nema_plots(results_dir="./diameters", thresholds=[20, 30, 40, 50, 60, 70, 80]):
+def generate_nema_plots(results_dir="./diameters", thresholds=[ 40, 50, 80]):
     nema_spheres = [10, 13, 17, 22, 28, 37]
     
     # Proste i twarde mapowanie: 1 to największa (37 mm), 6 to najmniejsza (10 mm)
@@ -63,7 +63,7 @@ def generate_nema_plots(results_dir="./diameters", thresholds=[20, 30, 40, 50, 6
         ideal_x = np.linspace(8, 40, 100)
         plt.plot(ideal_x, ideal_x, 'k--', alpha=0.6, label="Idealne dopasowanie (y=x)")
 
-        markers = {20: 'P', 30: 'X', 40: 'o', 50: 's', 60: '^', 70: 'D', 80: 'v'}
+        markers = {40: 'o', 50: 's', 80: 'v'}
         
         for th in thresholds:
             if th not in th_data or not th_data[th]: continue
@@ -85,7 +85,7 @@ def generate_nema_plots(results_dir="./diameters", thresholds=[20, 30, 40, 50, 6
         plt.grid(True, linestyle=':', alpha=0.7)
         plt.legend()
         
-        out_plot_path = os.path.join(results_dir, f"wykres_{case_name}.png")
+        out_plot_path = os.path.join(results_dir, f"wykres_40_50_80_{case_name}.png")
         plt.savefig(out_plot_path, dpi=300, bbox_inches='tight')
         plt.close()
         print(f"Zapisano wykres: {out_plot_path}")
