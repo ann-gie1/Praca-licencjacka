@@ -81,7 +81,7 @@ def generate_nema_plots(results_dir="./after_8.05_meeting/", thresholds=[40, 50,
         plt.figure(figsize=(10, 6))
         
         ideal_x = np.linspace(8, 40, 100)
-        plt.plot(ideal_x, ideal_x, 'k--', alpha=0.6, label="Idealne dopasowanie (y=x)")
+        plt.plot(ideal_x, ideal_x, 'k--', alpha=0.6, label="Perfect fit (y=x)")
 
         markers = {40: 'o', 50: 's', 80: 'v'}
         
@@ -96,17 +96,17 @@ def generate_nema_plots(results_dir="./after_8.05_meeting/", thresholds=[40, 50,
             plt.errorbar(
                 sorted_true, measured, yerr=errors, 
                 fmt=f'-{markers[th]}', capsize=5, capthick=1.5, 
-                label=f"Próg {th}%"
+                label=f"threshold {th}%"
             )
             
-        plt.title(f"Zrekonstruowana vs Rzeczywista średnica sfer\n{case_name}")
-        plt.xlabel("Rzeczywista średnica sfery NEMA [mm]")
-        plt.ylabel("Zmierzona średnica [mm]")
+        plt.title(f"Reconstructed vs Real sphere diameter")
+        plt.xlabel("Real NEMA IQ phantom sphere diameter [mm]")
+        plt.ylabel("Reconstructed diameter [mm]")
         plt.xticks(nema_spheres)
         plt.grid(True, linestyle=':', alpha=0.7)
         plt.legend()
         
-        out_plot_path = os.path.join(results_dir, f"wykres_{case_name}.png")
+        out_plot_path = os.path.join(results_dir, f"wykres_ang_{case_name}.png")
         plt.savefig(out_plot_path, dpi=300, bbox_inches='tight')
         plt.close()
         print(f"Zapisano: {out_plot_path}")
