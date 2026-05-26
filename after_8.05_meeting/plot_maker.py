@@ -13,12 +13,12 @@ def get_case_and_true_diam(filename):
         case = "Eksperyment"
         # Mapowanie dla eksperymentu dopasowane do wyników ze zdjęcia
         diam_map = {
-            "sphere_4": 10, 
-            "sphere_2": 13, 
-            "sphere_1": 17, 
-            "sphere_6": 22, 
-            "sphere_5": 28, 
-            "sphere_3": 37
+            "sphere_4": 22, 
+            "sphere_2": 28, 
+            "sphere_1": 37, 
+            "sphere_6": 10, 
+            "sphere_5": 13, 
+            "sphere_3": 17
         }
     else:
         if "18F_cal_gonzales" in filename: case = "sym_C-G_18F"
@@ -44,7 +44,7 @@ def get_case_and_true_diam(filename):
             
     return case, None
 
-def generate_nema_plots(results_dir="./after_8.05_meeting", thresholds=[40, 50, 60, 70, 80]):
+def generate_nema_plots(results_dir="./after_8.05_meeting/", thresholds=[40, 50, 80]):
     nema_spheres = [10, 13, 17, 22, 28, 37]
     
     # data[case][threshold][true_diameter] = (measured_diameter, error)
@@ -52,7 +52,7 @@ def generate_nema_plots(results_dir="./after_8.05_meeting", thresholds=[40, 50, 
 
     # Wczytywanie danych
     for th in thresholds:
-        csv_path = os.path.join(results_dir, f"wyniki_sfer_dim_{th}.csv")
+        csv_path = os.path.join(results_dir, f"dim_finder_csv_fwhm_smoothing/wyniki_sfer_dim_{th}.csv")
         if not os.path.exists(csv_path): continue
             
         with open(csv_path, mode="r", encoding="utf-8") as f:
@@ -83,7 +83,7 @@ def generate_nema_plots(results_dir="./after_8.05_meeting", thresholds=[40, 50, 
         ideal_x = np.linspace(8, 40, 100)
         plt.plot(ideal_x, ideal_x, 'k--', alpha=0.6, label="Idealne dopasowanie (y=x)")
 
-        markers = {40: 'o', 50: 's', 60: '^', 70: 'D', 80: 'v'}
+        markers = {40: 'o', 50: 's', 80: 'v'}
         
         for th in thresholds:
             points = th_data[th]
