@@ -52,15 +52,15 @@ for iso in izotopy:
     bar_width = 0.6
     
     # Rysowanie słupków skumulowanych
-    p1 = plt.bar(srednice, inside_counts, bar_width, label='Wewnątrz sfery (Woda)', color='#4CAF50')
-    p2 = plt.bar(srednice, plastic_counts, bar_width, bottom=inside_counts, label='W ściance (Plastik)', color='#FF9800')
+    p1 = plt.bar(srednice, inside_counts, bar_width, label='Inside the sphere', color='#4CAF50')
+    p2 = plt.bar(srednice, plastic_counts, bar_width, bottom=inside_counts, label='Within 1 mm wall', color='#FF9800')
     p3 = plt.bar(srednice, outside_counts, bar_width, bottom=np.array(inside_counts)+np.array(plastic_counts), 
-                 label='Poza układem (Spill-out)', color='#F44336')
+                 label='Spill-out', color='#F44336')
 
     # Konfiguracja estetyki
-    plt.title(f'Miejsce zatrzymania pozytonów - Izotop: {iso}', fontsize=16)
-    plt.xlabel('Średnica wewnętrzna sfery [mm]', fontsize=12)
-    plt.ylabel('Liczba cząstek', fontsize=12)
+    plt.title(f'Spatial distribution of positron stopping points - Isotope: {iso}', fontsize=24)
+    plt.xlabel('Sphere diameter [mm] [mm]', fontsize=16)
+    plt.ylabel('Simulated positron count', fontsize=16)
     plt.xticks(srednice)
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
     plt.grid(axis='y', linestyle='--', alpha=0.6)
