@@ -31,7 +31,7 @@ def momentum(E):
 def fermi_function_allowed(Z, E):
     alpha = 1/137
     p = momentum(E)
-    eta = alpha * Z * (E + m_e) / p
+    eta = - alpha * Z * (E + m_e) / p
     return (2 * np.pi * eta) / (1 - np.exp(-2 * np.pi * eta))
 
 def beta_plus_spectrum(E, E0, Z):
