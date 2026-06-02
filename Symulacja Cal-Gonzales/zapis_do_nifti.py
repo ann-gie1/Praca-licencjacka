@@ -4,7 +4,7 @@ import SimpleITK as sitk
 
 def main():
     print("Wczytywanie wyników symulacyjnych...")
-    df_all = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_c-g_1mln-conc.csv")
+    df_all = pd.read_csv("../dane_symulacja_cal_gonzales/wyniki_symulacji_c-g_1mln-conc_20626.csv")
 
     # Słownik precyzyjnych frakcji do pobrania na podstawie ekstrapolacji
     # oraz uwzględnienia całki rozpadu dla t = 217 min.
@@ -97,7 +97,7 @@ def main():
         img_sitk = sitk.GetImageFromArray(np.transpose(volume, (2, 1, 0)))
         img_sitk.SetSpacing((spacing, spacing, spacing))
 
-        plik_wyjsciowy = f"../dane_symulacja_cal_gonzales/symulacja_conc_correct_NEMA_{wybrany_izotop}.nii.gz"
+        plik_wyjsciowy = f"../dane_symulacja_cal_gonzales/symulacja_conc_correct_NEMA_{wybrany_izotop}_20626.nii.gz"
         sitk.WriteImage(img_sitk, plik_wyjsciowy)
 
         print(f"Zapisano NIfTI dla {wybrany_izotop} -> {plik_wyjsciowy}")
