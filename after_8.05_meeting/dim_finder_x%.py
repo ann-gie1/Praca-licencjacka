@@ -5,7 +5,7 @@ import glob
 import os
 import csv
 
-def analyze_spheres_subpixel(input_dirs, output_dir="./after_8.05_meeting", angles_step=5, pixel_spacing=2.5):
+def analyze_spheres_subpixel(input_dirs, output_dir="./after_8.05_meeting/dim_finder_csv_fwhm_smoothing", angles_step=5, pixel_spacing=2.5):
     files = []
     for d in input_dirs:
         found = glob.glob(os.path.join(d, "*max_intensity_slice_*.png"))
@@ -132,11 +132,11 @@ def analyze_spheres_subpixel(input_dirs, output_dir="./after_8.05_meeting", angl
 
 # --- KONFIGURACJA ŚCIEŻEK WEJŚCIOWYCH ---
 input_directories = [
-    "./after_8.05_meeting/squares/eksperyment",
-    "./after_8.05_meeting/squares/sym_C-G/18F",
-    "./after_8.05_meeting/squares/sym_C-G/44Sc",
-    "./after_8.05_meeting/squares/sym_CSDA/18F",
-    "./after_8.05_meeting/squares/sym_CSDA/44Sc",
+    "./after_8.05_meeting/squares_correct_smoothing/eksperyment",
+    "./after_8.05_meeting/squares_correct_smoothing/cal-gonzales/18F",
+    "./after_8.05_meeting/squares_correct_smoothing/cal-gonzales/44Sc",
+    "./after_8.05_meeting/squares_correct_smoothing/CSDA/18F",
+    "./after_8.05_meeting/squares_correct_smoothing/CSDA/44Sc",
 ]
 
 analyze_spheres_subpixel(input_directories, pixel_spacing=2.5)
