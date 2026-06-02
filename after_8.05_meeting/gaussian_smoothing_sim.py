@@ -5,10 +5,8 @@ import numpy as np
 
 # Lista ścieżek do plików
 file_paths = [
-    "./from_server/dane_symulacja_cal_gonzales/symulacja_conc_correct_NEMA_18F_20626.nii.gz",
-    "./from_server/dane_symulacja_cal_gonzales/symulacja_conc_correct_NEMA_44Sc_20626.nii.gz",
-    "./from_server/dane_symulacja_CSDA/symulacja_conc_correct_NEMA_18F_20626.nii.gz",
-    "./from_server/dane_symulacja_CSDA/symulacja_conc_correct_NEMA_44Sc_20626.nii.gz"
+    "../dane_symulacja_CSDA/symulacja_conc_correct_NEMA_18F_20626.nii.gz",
+    "../dane_symulacja_CSDA/symulacja_conc_correct_NEMA_44Sc_20626.nii.gz"
 ]
 
 fwhm_value = 2
@@ -39,7 +37,7 @@ for file_path in file_paths:
     # Wygeneruj nazwę wyjściową z unikalnym tagiem (zmieniono suffix na FWHM)
     base_name = os.path.basename(file_path)
     name, ext = base_name.split('.nii', 1)
-    output_path = f"./after_8.05_meeting/nii files/{name}_{tag}_smoothed_fwhm{fwhm_value}_20626.nii{ext}"
+    output_path = f"../nii files/{name}_{tag}_smoothed_fwhm{fwhm_value}_20626.nii{ext}"
 
     # Zapisz wynik
     new_img = nib.Nifti1Image(smoothed_data, img.affine, img.header)

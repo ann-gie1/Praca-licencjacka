@@ -7,7 +7,7 @@ import glob
 import os
 
 def main():
-    sciezka_szukania = "./after_8.05_meeting/symulacja_conc_correct_NEMA_*.nii.gz"
+    sciezka_szukania = "../nii files/symulacja_conc_correct_NEMA_*_smoothed_fwhm2_20626.nii.gz"
     pliki_nifti = glob.glob(sciezka_szukania)
 
     if not pliki_nifti:
@@ -24,7 +24,7 @@ def main():
         parent_dir = os.path.basename(os.path.dirname(input_nifti))
         symulacja = parent_dir.replace("dane_symulacja_", "")
         
-        output_image = f"./after_8.05_meeting/max_intensity_slice_global_{symulacja}_{izotop}.png"
+        output_image = f"../dane_symulacja_CSDA/20626_max_intensity_slice_global_{symulacja}_{izotop}.png"
 
         print(f"\n--- Przetwarzanie izotopu: {izotop} ---")
         
