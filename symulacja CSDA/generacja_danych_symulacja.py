@@ -19,8 +19,8 @@ base_diameter_mm = 10.0
 base_N_sim = 1000000
 
 # Ścieżki wyjściowe
-output_csv = "../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv"
-output_hist_csv = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.csv"
+output_csv = "../dane_symulacja_CSDA/Generacja_danych_1mln-conc20626.csv"
+output_hist_csv = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln20626.csv"
 
 # Usuwamy stary plik główny przed startem pętli
 if os.path.exists(output_csv):
@@ -55,9 +55,9 @@ def sample_energies(E0, Z, N):
     endOfRange = 5000
 
     E_grid = np.linspace(startOfRange, E0, endOfRange)
-    spectrum = beta_plus_spectrum(E_grid, E0, Z)
-    cdf = np.cumsum(spectrum)
-    cdf = cdf / cdf[-1]
+    dE = E_grid[1] - E_grid[0]
+    cdf = np.cumsum(spectrum * dE)
+    cdf /= cdf[-1]
     
     return np.interp(np.random.rand(N), cdf, E_grid)
 

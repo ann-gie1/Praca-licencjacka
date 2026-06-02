@@ -20,7 +20,7 @@ results_44Sc = []
 list_of_df = []
 
 print("Rozpoczynam wczytywanie pliku CSV (to może potrwać kilka minut)...")
-df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc.csv")
+df = pd.read_csv("../dane_symulacja_CSDA/Generacja_danych_1mln-conc20626.csv")
 print(f"Pomyślnie wczytano dane: {len(df)} wierszy. Rozpoczynam grupowanie...")
 
 grouped_df = df.groupby(['Izotop', 'Srednica_mm'])
@@ -98,5 +98,5 @@ for i, ((iso, d), group) in enumerate(grouped_df, 1):
 print("-" * 50)
 print("Łączenie i zapisywanie wyników końcowych do pliku CSV...")
 final_df = pd.concat(list_of_df)
-final_df.to_csv("../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc.csv", index=False)
+final_df.to_csv("../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc20626.csv", index=False)
 print("Gotowe!")
