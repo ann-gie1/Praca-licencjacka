@@ -55,6 +55,7 @@ def sample_energies(E0, Z, N):
     endOfRange = 5000
 
     E_grid = np.linspace(startOfRange, E0, endOfRange)
+    spectrum = beta_plus_spectrum(E_grid, E0, Z)
     dE = E_grid[1] - E_grid[0]
     cdf = np.cumsum(spectrum * dE)
     cdf /= cdf[-1]
