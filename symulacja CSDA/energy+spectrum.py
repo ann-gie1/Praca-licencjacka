@@ -41,7 +41,7 @@ def beta_plus_spectrum(E, E0, Z):
     return p * (E + m_e) * (E0 - E)**2 * F
 
 # --- 3. Data Loading ---
-plik_wejsciowy = "../dane_symulacja_CSDA/Generacja_danych_1mln.csv"
+plik_wejsciowy = "../dane_symulacja_CSDA/Generacja_danych_1mln-conc20626.csv"
 katalog_wyjsciowy = "../dane_symulacja_CSDA/"
 
 df = pd.read_csv(plik_wejsciowy)
@@ -86,7 +86,7 @@ for izotop in izotopy:
     plt.legend()
 
     bezpieczna_nazwa_izotopu = str(izotop).replace(" ", "_").replace("/", "_")
-    nazwa_pliku = f"energy_histogram_{bezpieczna_nazwa_izotopu}.png"
+    nazwa_pliku = f"20626_energy_histogram_{bezpieczna_nazwa_izotopu}.png"
     plik_wyjsciowy = os.path.join(katalog_wyjsciowy, nazwa_pliku)
     
     plt.tight_layout()

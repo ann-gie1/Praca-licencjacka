@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use('Agg') # Tryb bezokienkowy
 
 # 1. Parametry i wczytanie danych
-plik_wejsciowy = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc.csv"
+plik_wejsciowy = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc_20626.csv"
 wall_thickness_mm = 1.0
 katalog_wyjsciowy = "../dane_symulacja_CSDA/"
 
@@ -75,7 +75,7 @@ for iso in izotopy:
     plt.tight_layout()
     
     # 5. Zapis
-    nazwa_pliku = f"histogram_miejsce_stop_{iso}.png"
+    nazwa_pliku = f"histogram_miejsce_stop_{iso}_20626.png"
     sciezka_zapisu = f"{katalog_wyjsciowy}{nazwa_pliku}"
     plt.savefig(sciezka_zapisu, dpi=300)
     plt.close()
