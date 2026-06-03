@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use('Agg') # Tryb bezokienkowy
 
 # 1. Parametry i wczytanie danych
-plik_wejsciowy = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc_20626.csv"
+plik_wejsciowy = "../dane_symulacja_CSDA/wyniki_symulacji_1mln-conc20626.csv"
 wall_thickness_mm = 1.0
 katalog_wyjsciowy = "../dane_symulacja_CSDA/"
 
