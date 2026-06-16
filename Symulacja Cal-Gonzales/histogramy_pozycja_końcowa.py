@@ -62,7 +62,7 @@ for iso in izotopy:
     plt.xlabel('Sphere diameter [mm] [mm]', fontsize=22)
     plt.ylabel('Simulated positron count', fontsize=22)
     plt.xticks(srednice)
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fonsize=18)
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=18)
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     
     # Dodanie etykiet z procentami nad słupkami (opcjonalnie, dla lepszej analizy)
