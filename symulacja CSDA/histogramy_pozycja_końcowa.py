@@ -61,7 +61,8 @@ for iso in izotopy:
     plt.title(f'Spatial distribution of positron stopping points - Isotope: {iso}', fontsize=26)
     plt.xlabel('Sphere diameter [mm] [mm]', fontsize=22)
     plt.ylabel('Simulated positron count', fontsize=22)
-    plt.xticks(srednice)
+    plt.xticks(srednice, fontsize=12)
+    plt.yticks(fontsize=12)
     plt.legend(loc='upper left', bbox_to_anchor=(1, 1),  fontsize=18)
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     
