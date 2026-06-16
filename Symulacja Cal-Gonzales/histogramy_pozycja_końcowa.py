@@ -58,11 +58,11 @@ for iso in izotopy:
                  label='Spill-out', color='#F44336')
 
     # Konfiguracja estetyki
-    plt.title(f'Spatial distribution of positron stopping points - Isotope: {iso}', fontsize=24)
-    plt.xlabel('Sphere diameter [mm] [mm]', fontsize=16)
-    plt.ylabel('Simulated positron count', fontsize=16)
+    plt.title(f'Spatial distribution of positron stopping points - Isotope: {iso}', fontsize=26)
+    plt.xlabel('Sphere diameter [mm] [mm]', fontsize=22)
+    plt.ylabel('Simulated positron count', fontsize=22)
     plt.xticks(srednice)
-    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fonsize=18)
     plt.grid(axis='y', linestyle='--', alpha=0.6)
     
     # Dodanie etykiet z procentami nad słupkami (opcjonalnie, dla lepszej analizy)
@@ -70,7 +70,7 @@ for iso in izotopy:
         total = inside_counts[idx] + plastic_counts[idx] + outside_counts[idx]
         spill_out_val = (outside_counts[idx] / total) * 100
         plt.text(d, total + (max(outside_counts)*0.02), f'{spill_out_val:.1f}% out', 
-                 ha='center', va='bottom', fontsize=9, color='red', fontweight='bold')
+                 ha='center', va='bottom', fontsize=16, color='red', fontweight='bold')
 
     plt.tight_layout()
     
