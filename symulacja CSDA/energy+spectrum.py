@@ -8,12 +8,12 @@ import scipy.integrate as integrate
 
 # --- 1. Plotting Configuration ---
 plt.rcParams.update({
-    'font.size': 16,
-    'axes.titlesize': 20,
-    'axes.labelsize': 18,
-    'xtick.labelsize': 16,
-    'ytick.labelsize': 16,
-    'legend.fontsize': 16
+    'font.size': 18,
+    'axes.titlesize': 24,
+    'axes.labelsize': 22,
+    'xtick.labelsize': 18,
+    'ytick.labelsize': 18,
+    'legend.fontsize': 18
 })
 
 # --- 2. Physical Parameters & Theoretical Functions ---
@@ -55,7 +55,7 @@ izotopy = df['Izotop'].unique()
 for izotop in izotopy:
     df_izotop = df[df['Izotop'] == izotop]
     
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(12, 9))
     
     counts, bins, _ = plt.hist(df_izotop['Energia-wylosowana'], bins=100, 
                                edgecolor='black', alpha=0.65, label='Simulated Data (Histogram)')
