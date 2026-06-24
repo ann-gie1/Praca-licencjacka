@@ -83,7 +83,8 @@ for izotop in izotopy:
     plt.xlabel('Energy [MeV]')
     plt.ylabel('Counts')
     plt.grid(axis='y', alpha=0.5)
-    plt.legend(loc='upper right')
+    plt.ylim(0, max(counts) * 1.25)
+    plt.legend(loc='upper right', framealpha=1.0)
 
     bezpieczna_nazwa_izotopu = str(izotop).replace(" ", "_").replace("/", "_")
     nazwa_pliku = f"20626_energy_histogram_{bezpieczna_nazwa_izotopu}.png"
