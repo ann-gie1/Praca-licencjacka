@@ -23,7 +23,7 @@ zmienne = [
 
 # 3. Utworzenie siatki wykresów 2 wiersze x 3 kolumny
 fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-fig.suptitle(f"Weryfikacja jednorodności przestrzennej Monte Carlo (Sfera {wybrana_srednica} mm)", fontsize=16)
+fig.suptitle(f"Weryfikacja jednorodności przestrzennej Monte Carlo (Sfera {wybrana_srednica} mm)", fontsize=24)
 
 # Spłaszczenie tablicy osi, by łatwiej przypisywać wykresy w pętli
 axes = axes.flatten()

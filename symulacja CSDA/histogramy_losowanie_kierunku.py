@@ -8,7 +8,7 @@ import os
 matplotlib.use('Agg')
 
 # Powiększenie czcionki
-plt.rcParams.update({'font.size': 16})
+plt.rcParams.update({'font.size': 24})
 
 katalog_danych = "../dane_symulacja_CSDA"
 nazwa_pliku_wejsciowego = "Generacja_danych_1mln-conc.csv"
@@ -52,7 +52,7 @@ print("Angle calculations complete. Generating histograms...")
 # --- 3. Generowanie Histogramów ---
 fig, axes = plt.subplots(2, 3, figsize=(20, 12))
 overall_title = f"Monte Carlo Directional Uniformity Verification (Isotope: {izotop_cel}, Sphere: {srednica_cel} mm)"
-fig.suptitle(overall_title, fontsize=20)
+fig.suptitle(overall_title, fontsize=28)
 
 # Ukrywamy lewy górny wykres, żeby odwzorować układ (brak 'r')
 axes[0, 0].axis('off')
