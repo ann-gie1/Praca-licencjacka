@@ -8,12 +8,12 @@ import scipy.integrate as integrate
 
 # --- 1. Plotting Configuration ---
 plt.rcParams.update({
-    'font.size': 18,
-    'axes.titlesize': 24,
-    'axes.labelsize': 22,
-    'xtick.labelsize': 18,
-    'ytick.labelsize': 18,
-    'legend.fontsize': 18
+    'font.size': 26,
+    'axes.titlesize': 32,
+    'axes.labelsize': 30,
+    'xtick.labelsize': 26,
+    'ytick.labelsize': 26,
+    'legend.fontsize': 26
 })
 
 # --- 2. Physical Parameters & Theoretical Functions ---
