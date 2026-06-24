@@ -1,9 +1,16 @@
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg') # Kluczowe ustawienie - wymusza tryb bezekranowy
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# 1. Wczytanie danych
+# 1. Globalna zmiana rozmiaru czcionek (+12 pkt do wartości domyślnych)
+plt.rcParams.update({
+    'font.size': 22,          # Ticks (domyślnie 10 -> 22)
+    'axes.labelsize': 22,     # Etykiety osi X i Y (domyślnie 10 -> 22)
+    'axes.titlesize': 24      # Tytuły poszczególnych wykresów (domyślnie 12 -> 24)
+})
+
+# Wczytanie danych
 plik_wejsciowy = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.csv"
 plik_wyjsciowy = "../dane_symulacja_CSDA/histogramy_weryfikacja_1mln.png"
 
@@ -21,11 +28,13 @@ zmienne = [
     ('x', 'red'), ('y', 'orange'), ('z', 'brown')
 ]
 
-# 3. Utworzenie siatki wykresów 2 wiersze x 3 kolumny
-fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-fig.suptitle(f"Weryfikacja jednorodności przestrzennej Monte Carlo (Sfera {wybrana_srednica} mm)", fontsize=24)
+# 3. Utworzenie siatki wykresów
+# Zwiększono figsize z (15, 10) na (22, 14), aby pomieścić większe teksty
+fig, axes = plt.subplots(2, 3, figsize=(22, 14))
 
-# Spłaszczenie tablicy osi, by łatwiej przypisywać wykresy w pętli
+# Główny tytuł powiększony z 24 na 36
+fig.suptitle(f"Weryfikacja jednorodności przestrzennej Monte Carlo (Sfera {wybrana_srednica} mm)", fontsize=36)
+
 axes = axes.flatten()
 
 # 4. Pętla rysująca
@@ -36,7 +45,8 @@ for idx, (nazwa, kolor) in enumerate(zmienne):
     axes[idx].set_ylabel("Zliczenia")
 
 # 5. Finalny layout i zapis do pliku
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+# Skorygowano górny margines (0.93), aby ogromny tytuł główny nie obcinał się na krawędzi
+plt.tight_layout(rect=[0, 0.03, 1, 0.93])
 plt.savefig(plik_wyjsciowy, dpi=300)
 
 # Zwolnienie pamięci RAM

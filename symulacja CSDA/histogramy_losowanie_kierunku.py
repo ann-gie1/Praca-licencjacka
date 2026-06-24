@@ -7,8 +7,14 @@ import os
 # --- Konfiguracja ---
 matplotlib.use('Agg')
 
-# Powiększenie czcionki
-plt.rcParams.update({'font.size': 24})
+# Globalne powiększenie wszystkich czcionek o kolejne 12 pkt
+plt.rcParams.update({
+    'font.size': 36,            # Zwiększone z 24 do 36
+    'axes.labelsize': 36,       # Rozmiar etykiet osi X i Y
+    'axes.titlesize': 36,       # Rozmiar tytułów podwykresów
+    'xtick.labelsize': 30,      # Rozmiar wartości na osi X
+    'ytick.labelsize': 30       # Rozmiar wartości na osi Y
+})
 
 katalog_danych = "../dane_symulacja_CSDA"
 nazwa_pliku_wejsciowego = "Generacja_danych_1mln-conc.csv"
@@ -50,9 +56,10 @@ df['theta_dir'] = (theta_raw + 2 * np.pi) % (2 * np.pi)
 print("Angle calculations complete. Generating histograms...")
 
 # --- 3. Generowanie Histogramów ---
-fig, axes = plt.subplots(2, 3, figsize=(20, 12))
+# Zwiększono rozmiar z (20, 12) na (30, 18), aby gigantyczne opisy tekstowe się pomieściły
+fig, axes = plt.subplots(2, 3, figsize=(30, 18))
 overall_title = f"Monte Carlo Directional Uniformity Verification (Isotope: {izotop_cel}, Sphere: {srednica_cel} mm)"
-fig.suptitle(overall_title, fontsize=28)
+fig.suptitle(overall_title, fontsize=40) # Zwiększone z 28 do 40
 
 # Ukrywamy lewy górny wykres, żeby odwzorować układ (brak 'r')
 axes[0, 0].axis('off')
@@ -80,7 +87,8 @@ for var_name, color, ax, title_label, x_label, current_range in zmienne_dir:
     ax.set_ylim(0, y_max * 1.1)
 
 # --- 4. Finalny Układ i Zapis ---
-plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+# Zmniejszono górny margines z 0.95 na 0.90, aby zapobiec nakładaniu się głównego tytułu na wykresy
+plt.tight_layout(rect=[0, 0.03, 1, 0.90])
 
 print(f"Saving plot to: {plik_wyjsciowy}")
 plt.savefig(plik_wyjsciowy, dpi=300, bbox_inches='tight')
